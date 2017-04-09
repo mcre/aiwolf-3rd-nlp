@@ -16,12 +16,12 @@ import net.mchs_u.mc.aiwolf.nlp.agito.McreNlpPlayer;
 
 public class Starter {
 
-	public static void startServer(int port, int gameNum) throws SocketTimeoutException, IOException {
+	public static void startServer(int port, int gameNum, int timeLimit) throws SocketTimeoutException, IOException {
 		int playerNum = 5;
 		GameSetting gameSetting = GameSetting.getDefaultGame(playerNum);
 		gameSetting.setValidateUtterance(false);
 		gameSetting.setTalkOnFirstDay(true);
-		gameSetting.setTimeLimit(5000);
+		gameSetting.setTimeLimit(timeLimit);
 
 		new Thread() {
 			public void run() {
@@ -42,17 +42,12 @@ public class Starter {
 		}.start();
 	}
 
-	public static void startClient(String host, int port, int num) throws InstantiationException, IllegalAccessException {
+	public static void startClient(String host, int port, int num, String[] names) throws InstantiationException, IllegalAccessException {
 		for(int i = 0; i < num; i++) {
 			TcpipClient client = new TcpipClient(host, port);
 			client.connect(new McreNlpPlayer());
-			client.setName("m_cre");
+			client.setName(names[i]);
 		}
-	}
-
-	public static void main(String[] args) throws InstantiationException, IllegalAccessException, SocketTimeoutException, IOException  {
-		startServer(10000, 100);
-		startClient("localhost", 10000, 5);
 	}
 
 }
