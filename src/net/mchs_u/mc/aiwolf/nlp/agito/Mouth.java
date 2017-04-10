@@ -18,9 +18,10 @@ import org.aiwolf.client.lib.Content;
 import org.aiwolf.client.lib.Topic;
 import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.data.Role;
-import org.aiwolf.common.data.Species;
 import org.aiwolf.common.data.Talk;
 import org.aiwolf.common.net.GameInfo;
+
+import net.mchs_u.mc.aiwolf.nlp.common.Transrater;
 
 public class Mouth {
 	private final static String PATH_POSI_CHATS = "dic/posichats.txt";
@@ -78,17 +79,18 @@ public class Mouth {
 				return Talk.SKIP;
 			if(content.getRole() == Role.WEREWOLF)
 				return "わおーん、僕は人狼だよ。";
-			return "僕は" + roleToString(content.getRole()) + "だよ。";
+			return "僕は" + Transrater.roleToString(content.getRole()) + "だよ。";
 		case DIVINED:
+			String r = Transrater.speciesToString(content.getResult());
 			switch ((int)(Math.random() * 5)) {
-			case 0: return content.getTarget() + "さんの占い結果は、" + speciesToString(content.getResult()) + "だったよ。";
-			case 1: return content.getTarget() + "さんの占いの結果は、" + speciesToString(content.getResult()) + "だったよ。";
-			case 2: return content.getTarget() + "さんを占ったら、" + speciesToString(content.getResult()) + "だったよ。";
-			case 3: return content.getTarget() + "さんを占った結果は、" + speciesToString(content.getResult()) + "だったよ。";
-			case 4: return "昨日の占い結果だよ、" + content.getTarget() + "さんは" + speciesToString(content.getResult()) + "だったよ。";
+			case 0: return content.getTarget() + "さんの占い結果は、" + r + "だったよ。";
+			case 1: return content.getTarget() + "さんの占いの結果は、" + r + "だったよ。";
+			case 2: return content.getTarget() + "さんを占ったら、" + r + "だったよ。";
+			case 3: return content.getTarget() + "さんを占った結果は、" + r + "だったよ。";
+			case 4: return "昨日の占い結果だよ、" + content.getTarget() + "さんは" + r + "だったよ。";
 			}
 		case IDENTIFIED:
-			return content.getTarget() + "さんの霊能結果は、" + speciesToString(content.getResult()) + "だったよ。";
+			return content.getTarget() + "さんの霊能結果は、" + Transrater.speciesToString(content.getResult()) + "だったよ。";
 		case OPERATOR:
 			Content c = content.getContentList().get(0);
 			if(c.getTopic() != Topic.VOTE)
@@ -295,35 +297,4 @@ public class Mouth {
 			return Talk.SKIP;
 		}
 	}
-
-	private static String roleToString(Role role) {
-		switch (role) {
-		case BODYGUARD:
-			return "狩人";
-		case MEDIUM:
-			return "霊媒師";
-		case POSSESSED:
-			return "狂人";
-		case SEER:
-			return "占い師";
-		case VILLAGER:
-			return "村人";
-		case WEREWOLF:
-			return "人狼";
-		default:
-			return null;
-		}
-	}
-
-	private static String speciesToString(Species species) {
-		switch (species) {
-		case HUMAN:
-			return "人間";
-		case WEREWOLF:
-			return "人狼";
-		default:
-			return null;
-		}
-	}
-
 }
