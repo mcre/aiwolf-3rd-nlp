@@ -4,26 +4,33 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 
 public class Main {
-	public static void main(String[] args) throws InstantiationException, IllegalAccessException, SocketTimeoutException, IOException  {
+	public static void main(String[] args) throws InstantiationException, IllegalAccessException, SocketTimeoutException, IOException {
+		int gameNum = 1;
+		
 		String type = null;
-		type = "ローカル自己対戦";
+		//type = "ローカル*5";
+		type = "ローカル*4 + 人間*1";
 		//type = "大会5人接続";
 		//type = "大会1人接続";
-		
-		String[] names1  = {"m_cre"};
-		String[] names5A = {"m_cre",  "m_cre",  "m_cre",  "m_cre",  "m_cre"};
-		String[] names5B = {"m_cre1", "m_cre2", "m_cre3", "m_cre4", "m_cre5"};
-		
+				
 		switch (type) {
-		case "ローカル自己対戦用":
-			Starter.startServer(10000, 100, 60000);
-			Starter.startClient("localhost", 10000, 5, names5B);
+		case "ローカル*5":
+			Starter.startServer(10000, gameNum, 300000);
+			for(int i = 0; i < 5; i++)
+				Starter.startAIClient("localhost", 10000);
+			break;
+		case "ローカル*4 + 人間*1":
+			Starter.startServer(10000, gameNum, 300000);
+			for(int i = 0; i < 4; i++)
+				Starter.startAIClient("localhost", 10000);
+			Starter.startHumanClient("localhost", 10000);
 			break;
 		case "大会5人接続":
-			Starter.startClient("kanolab.net", 10000, 5, names5A);
+			for(int i = 0; i < 4; i++)
+				Starter.startAIClient("kanolab.net", 10000);
 			break;
 		case "大会1人接続":
-			Starter.startClient("kanolab.net", 10000, 1, names1);
+			Starter.startAIClient("kanolab.net", 10000);
 			break;
 		}
 		

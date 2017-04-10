@@ -2,6 +2,7 @@ package net.mchs_u.mc.aiwolf.nlp.common;
 
 import org.aiwolf.common.data.Role;
 import org.aiwolf.common.data.Species;
+import org.aiwolf.common.data.Status;
 
 public class Transrater {
 	public static String roleToString(Role role) {
@@ -29,6 +30,17 @@ public class Transrater {
 			return "人間";
 		case WEREWOLF:
 			return "人狼";
+		default:
+			return null;
+		}
+	}
+	
+	public static String statusToString(Status status) {
+		switch (status) {
+		case ALIVE:
+			return "生存";
+		case DEAD:
+			return "死亡";
 		default:
 			return null;
 		}

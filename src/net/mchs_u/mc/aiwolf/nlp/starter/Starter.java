@@ -13,6 +13,7 @@ import org.aiwolf.server.net.TcpipServer;
 import org.aiwolf.server.util.FileGameLogger;
 
 import net.mchs_u.mc.aiwolf.nlp.agito.McreNlpPlayer;
+import net.mchs_u.mc.aiwolf.nlp.human.HumanPlayer;
 
 public class Starter {
 
@@ -42,12 +43,15 @@ public class Starter {
 		}.start();
 	}
 
-	public static void startClient(String host, int port, int num, String[] names) throws InstantiationException, IllegalAccessException {
-		for(int i = 0; i < num; i++) {
-			TcpipClient client = new TcpipClient(host, port);
-			client.connect(new McreNlpPlayer());
-			client.setName(names[i]);
-		}
+	public static void startAIClient(String host, int port) throws InstantiationException, IllegalAccessException {
+		TcpipClient client = new TcpipClient(host, port);
+		client.connect(new McreNlpPlayer());
+		client.setName("m_cre");
+	}
+	
+	public static void startHumanClient(String host, int port) throws InstantiationException, IllegalAccessException {
+		TcpipClient client = new TcpipClient(host, port);
+		client.connect(new HumanPlayer());
 	}
 
 }
