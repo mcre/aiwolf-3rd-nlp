@@ -81,11 +81,18 @@ public class Mouth {
 				return Talk.SKIP;
 			return r(c.getTarget() + "<さん>に投票して<ね>。");
 		case VOTE:
+			if(getEstimate().isPowerPlay()) {
+				if((gameInfo.getRole() == Role.WEREWOLF || gameInfo.getRole() == Role.POSSESSED))
+					return r(t + "<さん>に投票する<よ>。");
+				else
+					return Talk.SKIP;
+			}
 			// 1回目の投票宣言は何も情報がない中での宣言なのでスルーする
 			if(firstVoted) {
-				switch ((int)(Math.random() * 2)) {
-				case 0: return r(t + "<さん>に投票する<よ>。");
-				case 1: return r(t + "<さん>に投票しようかな。");
+				switch ((int)(Math.random() * 3)) {
+				case 0: return r(t + "<さん>があやしい<よ>。");
+				case 1: return r(t + "<さん>が人狼だと思う<よ>。");
+				case 2: return r(t + "<さん>が一番おかしいと思う<よ>。");
 				}
 			}
 			firstVoted = true;
