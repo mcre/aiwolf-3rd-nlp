@@ -59,7 +59,7 @@ public class McreNlpPlayer implements Player {
 		player.initialize(gameInfo, gameSetting);
 		
 		Estimate estimate = (Estimate)player.getSubjectiveEstimate();
-		mouth.initialize(gameInfo, estimate);
+		mouth.initialize(estimate);
 		ear.initialize(gameInfo, estimate);
 	}
 	

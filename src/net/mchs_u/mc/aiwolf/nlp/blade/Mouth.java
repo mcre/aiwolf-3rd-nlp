@@ -1,16 +1,7 @@
 package net.mchs_u.mc.aiwolf.nlp.blade;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 import org.aiwolf.client.lib.Content;
@@ -24,26 +15,15 @@ import net.mchs_u.mc.aiwolf.dokin.Estimate;
 import net.mchs_u.mc.aiwolf.nlp.common.Transrater;
 
 public class Mouth {
-	private final static String PATH_POSI_CHATS = "dic/posichats.txt";
-	private final static String PATH_NEGA_CHATS = "dic/negachats.txt";
-	private final static String PATH_SEER_CHATS = "dic/seerchats.txt";
-
-	private final static double CHAT_RATE = 0.2d; // 話題がないときにチャットリストを消費する確率
-
-	private List<String> negaChats = null;
-	private List<String> posiChats = null;
-	private List<String> seerChats = null;
-
 	private Set<String> talkedSet = null;
 	
 	private Agent todayVotedTarget = null;
 	
 	private Estimate estimate = null;
 		
-	public void initialize(GameInfo gameInfo, Estimate estimate) {
+	public void initialize(Estimate estimate) {
 		this.estimate = estimate;
 		talkedSet = new HashSet<>();
-		loadChats(new Random((new Date()).getTime() + gameInfo.getAgent().getAgentIdx() * 222));
 	}
 	
 	public void dayStart() {
@@ -175,89 +155,8 @@ public class Mouth {
 				}
 			}
 		}
-
-		return chat(gameInfo);
-	}
-
-	private String chat(GameInfo gameInfo) {
-		if(estimate.getCoMap().get(gameInfo.getAgent()) == Role.SEER) { //自分が占い師COしているとき
-			if(seerChats.size() < 1)
-				return Talk.SKIP;
-
-			if(Math.random() < CHAT_RATE) {
-				String ret = seerChats.get(0);
-				seerChats.remove(0);
-				List<Agent> targets = new ArrayList<Agent>(gameInfo.getAliveAgentList());
-				targets.remove(gameInfo.getAgent());
-				int x = (int)(Math.random() * targets.size());
-				return ret.replace("@", targets.get(x).toString());
-			}
-			return Talk.SKIP;
-		}
 		
-		if(gameInfo.getAgentList().size() == gameInfo.getAliveAgentList().size()) { // まだだれも死んでない ⇒ posi
-			if(posiChats.size() < 1)
-				return Talk.SKIP;
-
-			if(Math.random() < CHAT_RATE) {
-				String ret = posiChats.get(0);
-				posiChats.remove(0);
-				List<Agent> targets = new ArrayList<Agent>(gameInfo.getAliveAgentList());
-				targets.remove(gameInfo.getAgent());
-				int x = (int)(Math.random() * targets.size());
-				return ret.replace("@", targets.get(x).toString());
-			}
-			return Talk.SKIP;
-		} else { // nega
-			if(negaChats.size() < 1)
-				return Talk.SKIP;
-
-			if(Math.random() < CHAT_RATE) {
-				String ret = negaChats.get(0);
-				negaChats.remove(0);
-				List<Agent> targets = new ArrayList<Agent>(gameInfo.getAliveAgentList());
-				targets.remove(gameInfo.getAgent());
-				int x = (int)(Math.random() * targets.size());
-				return ret.replace("@", targets.get(x).toString());
-			}
-			return Talk.SKIP;
-		}
-	}
-
-	private void loadChats(Random rnd) {
-		negaChats = new LinkedList<>();
-		posiChats = new LinkedList<>();
-		seerChats = new LinkedList<>();
-
-		try(BufferedReader br = new BufferedReader(new FileReader(PATH_NEGA_CHATS))) {
-			String line = null;
-			while((line = br.readLine()) != null) {
-				negaChats.add(line);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 
-		Collections.shuffle(negaChats, rnd);
-
-		try(BufferedReader br = new BufferedReader(new FileReader(PATH_POSI_CHATS))) {
-			String line = null;
-			while((line = br.readLine()) != null) {
-				posiChats.add(line);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 
-		Collections.shuffle(posiChats, rnd);
-		
-		try(BufferedReader br = new BufferedReader(new FileReader(PATH_SEER_CHATS))) {
-			String line = null;
-			while((line = br.readLine()) != null) {
-				seerChats.add(line);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 
-		Collections.shuffle(seerChats, rnd);
+		return Talk.SKIP;
 	}
 
 	public String toNaturalLanguageForWhisper(GameInfo gameInfo, String protocol) {		
