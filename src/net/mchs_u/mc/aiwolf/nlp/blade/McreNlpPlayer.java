@@ -8,7 +8,6 @@ import org.aiwolf.common.data.Talk;
 import org.aiwolf.common.net.GameInfo;
 import org.aiwolf.common.net.GameSetting;
 
-import net.mchs_u.mc.aiwolf.dokin.Estimate;
 import net.mchs_u.mc.aiwolf.dokin.McrePlayer;
 
 public class McreNlpPlayer implements Player {
@@ -21,8 +20,8 @@ public class McreNlpPlayer implements Player {
 
 	public McreNlpPlayer() {
 		player = new net.mchs_u.mc.aiwolf.dokin.McrePlayer();
-		ear = new Ear();
-		mouth = new Mouth();
+		ear = new Ear(player);
+		mouth = new Mouth(player);
 	}
 	
 	public void update(GameInfo gameInfo) {
@@ -57,10 +56,8 @@ public class McreNlpPlayer implements Player {
 	
 	public void initialize(GameInfo gameInfo, GameSetting gameSetting) {
 		player.initialize(gameInfo, gameSetting);
-		
-		Estimate estimate = (Estimate)player.getSubjectiveEstimate();
-		mouth.initialize(estimate);
-		ear.initialize(gameInfo, estimate);
+		ear.initialize();
+		mouth.initialize();
 	}
 	
 	public void dayStart() {

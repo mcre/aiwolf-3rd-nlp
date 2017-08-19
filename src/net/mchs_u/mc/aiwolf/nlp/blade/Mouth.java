@@ -12,6 +12,7 @@ import org.aiwolf.common.data.Talk;
 import org.aiwolf.common.net.GameInfo;
 
 import net.mchs_u.mc.aiwolf.dokin.Estimate;
+import net.mchs_u.mc.aiwolf.dokin.McrePlayer;
 import net.mchs_u.mc.aiwolf.nlp.common.Transrater;
 
 public class Mouth {
@@ -19,10 +20,13 @@ public class Mouth {
 	
 	private Agent todayVotedTarget = null;
 	
-	private Estimate estimate = null;
+	private McrePlayer player = null;
+	
+	public Mouth(McrePlayer player) {
+		this.player = player;
+	}
 		
-	public void initialize(Estimate estimate) {
-		this.estimate = estimate;
+	public void initialize() {
 		talkedSet = new HashSet<>();
 	}
 	
@@ -91,7 +95,7 @@ public class Mouth {
 	}
 
 	private String skipTalk(GameInfo gameInfo, Collection<String> answers) {
-		if(estimate.isPowerPlay()) { // PPモード 
+		if(getEstimate().isPowerPlay()) { // PPモード 
 			if(!talkedSet.contains("パワープレイ反応")){
 				talkedSet.add("パワープレイ反応");
 				if(gameInfo.getRole() == Role.WEREWOLF) { // 人狼
@@ -117,11 +121,11 @@ public class Mouth {
 			}
 		}
 
-		if(estimate.getCoMap().get(gameInfo.getAgent()) == Role.SEER) { // 自分が占い師COしてるとき
-			if(estimate.getCoSet(Role.SEER).size() == 2) { //二人COしているとき
+		if(getEstimate().getCoMap().get(gameInfo.getAgent()) == Role.SEER) { // 自分が占い師COしてるとき
+			if(getEstimate().getCoSet(Role.SEER).size() == 2) { //二人COしているとき
 				if(!talkedSet.contains("対抗占い師反応")){
 					talkedSet.add("対抗占い師反応");
-					Set<Agent> coSeers = estimate.getCoSet(Role.SEER);
+					Set<Agent> coSeers = getEstimate().getCoSet(Role.SEER);
 					coSeers.remove(gameInfo.getAgent());
 					Agent t = (Agent)coSeers.toArray()[0];
 					
@@ -135,7 +139,7 @@ public class Mouth {
 		}
 		
 		// COしてない人
-		if(estimate.getCoSet(Role.SEER).size() == 2) { //二人COしているとき
+		if(getEstimate().getCoSet(Role.SEER).size() == 2) { //二人COしているとき
 			if(!talkedSet.contains("二人占い師反応")){
 				talkedSet.add("二人占い師反応");
 				switch ((int)(Math.random() * 5)) {
@@ -180,5 +184,9 @@ public class Mouth {
 		default:
 			return Talk.SKIP;
 		}
+	}
+	
+	private Estimate getEstimate() {
+		return (Estimate)player.getPretendVillagerEstimate();
 	}
 }
