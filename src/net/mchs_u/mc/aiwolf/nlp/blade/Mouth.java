@@ -136,20 +136,19 @@ public class Mouth {
 					Agent t = (Agent)coSeers.toArray()[0];
 
 					switch ((int)(Math.random() * 5)) {
-					case 0: return r(t + "<さん>は嘘をついて<います>！");
-					case 1: return r(t + "<さん>は嘘つき<です>！");
+					case 0: return r(t + "<さん>は嘘をついて<います>！　<僕>が本当の占い師<です>！");
+					case 1: return r(t + "<さん>は偽物<です>！　<僕>こそが本当の占い師<です>！");
 					case 2: return r(">>" + t + " " + t + "<さん>、<あなた>が人狼<なのですか>！？");
 					}
 				}
 			}
-		}
-
-		// COしてない人
-		if(getEstimate().getCoSet(Role.SEER).size() == 2) { //二人COしているとき
-			if(!talkedSet.contains("二人占い師反応")){
-				talkedSet.add("二人占い師反応");
-				switch ((int)(Math.random() * 5)) {
-				case 0: return "どっちが本当の占い師なんだろう……。";
+		} else {
+			if(getEstimate().getCoSet(Role.SEER).size() == 2) { //二人COしているとき
+				if(!talkedSet.contains("二人占い師反応")){
+					talkedSet.add("二人占い師反応");
+					switch ((int)(Math.random() * 5)) {
+					case 0: return "どっちが本当の占い師なんだろう……。";
+					}
 				}
 			}
 		}
