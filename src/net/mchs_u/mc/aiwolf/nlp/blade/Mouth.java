@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -21,6 +20,7 @@ import org.aiwolf.common.data.Role;
 import org.aiwolf.common.data.Talk;
 import org.aiwolf.common.net.GameInfo;
 
+import net.mchs_u.mc.aiwolf.dokin.Estimate;
 import net.mchs_u.mc.aiwolf.nlp.common.Transrater;
 
 public class Mouth {
@@ -38,7 +38,10 @@ public class Mouth {
 	
 	private Agent todayVotedTarget = null;
 	
-	public void initialize(GameInfo gameInfo) {
+	private Estimate estimate = null;
+		
+	public void initialize(GameInfo gameInfo, Estimate estimate) {
+		this.estimate = estimate;
 		talkedSet = new HashSet<>();
 		loadChats(new Random((new Date()).getTime() + gameInfo.getAgent().getAgentIdx() * 222));
 	}
@@ -47,7 +50,7 @@ public class Mouth {
 		todayVotedTarget = null;
 	}
 
-	public String toNaturalLanguageForTalk(GameInfo gameInfo, Map<Agent, Role> coMap, String protocol, Collection<String> answers) {
+	public String toNaturalLanguageForTalk(GameInfo gameInfo, String protocol, Collection<String> answers) {
 		if(!Content.validate(protocol)) {
 			System.err.println("Mouth: 内部エージェントがプロトコル以外を喋ってる -> " + protocol);
 			return Talk.SKIP;
@@ -73,7 +76,7 @@ public class Mouth {
 		case OVER:
 			return Talk.OVER;
 		case SKIP:
-			return skipTalk(gameInfo, coMap, answers);
+			return skipTalk(gameInfo, answers);
 		case COMINGOUT:
 			if(!content.getTarget().equals(gameInfo.getAgent()))
 				return Talk.SKIP;
@@ -107,26 +110,8 @@ public class Mouth {
 		}
 	}
 
-	private static int countCoMap(Map<Agent, Role> coMap, Role role) {
-		int ret = 0;
-		for(Role r: coMap.values()) {
-			if(r == role)
-				ret++;
-		}
-		return ret;
-	}
-	
-	private static Set<Agent> coAgents(Map<Agent, Role> coMap, Role role) {
-		Set<Agent> ret = new HashSet<>();
-		for(Map.Entry<Agent, Role> entry: coMap.entrySet()) {
-			if(entry.getValue() == role)
-				ret.add(entry.getKey());
-		}
-		return ret;
-	}
-
-	private String skipTalk(GameInfo gameInfo, Map<Agent, Role> coMap, Collection<String> answers) {
-		if(countCoMap(coMap, Role.WEREWOLF) > 0) { // PPモード 
+	private String skipTalk(GameInfo gameInfo, Collection<String> answers) {
+		if(estimate.isPowerPlay()) { // PPモード 
 			if(!talkedSet.contains("パワープレイ反応")){
 				talkedSet.add("パワープレイ反応");
 				if(gameInfo.getRole() == Role.WEREWOLF) { // 人狼
@@ -152,11 +137,11 @@ public class Mouth {
 			}
 		}
 
-		if(coMap.get(gameInfo.getAgent()) == Role.SEER) { // 占い師COしてるとき
-			if(countCoMap(coMap, Role.SEER) == 2) { //二人COしているとき
+		if(estimate.getCoMap().get(gameInfo.getAgent()) == Role.SEER) { // 自分が占い師COしてるとき
+			if(estimate.getCoSet(Role.SEER).size() == 2) { //二人COしているとき
 				if(!talkedSet.contains("対抗占い師反応")){
 					talkedSet.add("対抗占い師反応");
-					Set<Agent> coSeers = coAgents(coMap, Role.SEER);
+					Set<Agent> coSeers = estimate.getCoSet(Role.SEER);
 					coSeers.remove(gameInfo.getAgent());
 					Agent t = (Agent)coSeers.toArray()[0];
 					
@@ -170,7 +155,7 @@ public class Mouth {
 		}
 		
 		// COしてない人
-		if(countCoMap(coMap, Role.SEER) == 2) { //二人COしているとき
+		if(estimate.getCoSet(Role.SEER).size() == 2) { //二人COしているとき
 			if(!talkedSet.contains("二人占い師反応")){
 				talkedSet.add("二人占い師反応");
 				switch ((int)(Math.random() * 5)) {
@@ -191,11 +176,11 @@ public class Mouth {
 			}
 		}
 
-		return chat(gameInfo, coMap);
+		return chat(gameInfo);
 	}
 
-	private String chat(GameInfo gameInfo, Map<Agent, Role> coMap) {
-		if(coMap.get(gameInfo.getAgent()) == Role.SEER) { //占い師COしているとき
+	private String chat(GameInfo gameInfo) {
+		if(estimate.getCoMap().get(gameInfo.getAgent()) == Role.SEER) { //自分が占い師COしているとき
 			if(seerChats.size() < 1)
 				return Talk.SKIP;
 
@@ -275,7 +260,7 @@ public class Mouth {
 		Collections.shuffle(seerChats, rnd);
 	}
 
-	public String toNaturalLanguageForWhisper(GameInfo gameInfo, Map<Agent, Role> coMap, String protocol) {		
+	public String toNaturalLanguageForWhisper(GameInfo gameInfo, String protocol) {		
 		if(!Content.validate(protocol)) {
 			System.err.println("Mouth: 内部エージェントがプロトコル以外を喋ってる -> " + protocol);
 			return Talk.SKIP;

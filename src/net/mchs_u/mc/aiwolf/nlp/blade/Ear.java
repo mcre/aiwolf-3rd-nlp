@@ -22,6 +22,8 @@ import org.aiwolf.common.data.Species;
 import org.aiwolf.common.data.Talk;
 import org.aiwolf.common.net.GameInfo;
 
+import net.mchs_u.mc.aiwolf.dokin.Estimate;
+
 // TODO 5人人狼以外も考慮する場合
 // 霊能結果認識の実装
 // Whisperの実装
@@ -31,12 +33,16 @@ public class Ear{
 
 	private Map<String, String> translatedMap = null; 
 	private Map<String, String> qas = null; // Mouthに渡すQA集
+	
+	@SuppressWarnings("unused")
+	private Estimate estimate = null;
 
 	public Ear() {
 		translatedMap = load();
 	}
 	
-	public void initialize(GameInfo gameInfo) {
+	public void initialize(GameInfo gameInfo, Estimate estimate) {
+		this.estimate = estimate;
 	}
 	
 	public void dayStart() {

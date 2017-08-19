@@ -1,26 +1,23 @@
 package net.mchs_u.mc.aiwolf.nlp.blade;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.aiwolf.client.lib.Content;
-import org.aiwolf.client.lib.Topic;
 import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.data.Player;
-import org.aiwolf.common.data.Role;
 import org.aiwolf.common.data.Talk;
 import org.aiwolf.common.net.GameInfo;
 import org.aiwolf.common.net.GameSetting;
 
+import net.mchs_u.mc.aiwolf.dokin.Estimate;
+import net.mchs_u.mc.aiwolf.dokin.McrePlayer;
+
 public class McreNlpPlayer implements Player {
-	private Player player = null;
+	private McrePlayer player = null;
+	
 	private GameInfo gameInfo = null;
 	private Mouth mouth;
 	private Ear ear;
 	private int listHead; // トークをどこまでprint/処理したかの管理
-	
-	private Map<Agent, Role> coMap = null;
 
 	public McreNlpPlayer() {
 		player = new net.mchs_u.mc.aiwolf.dokin.McrePlayer();
@@ -38,9 +35,6 @@ public class McreNlpPlayer implements Player {
 		
 		for(int i = listHead; i < talkList.size(); i++){
 			System.out.println("　○log : " + gameInfo.getAgent() + " " + getName() + "\t" + talkList.get(i) + " ( -> " + prTalkList.get(i).getText() + " ) ");
-			Content c = new Content(prTalkList.get(i).getText());
-			if(c.getTopic() == Topic.COMINGOUT)
-				coMap.put(c.getTarget(), c.getRole());
 			listHead++;
 		}
 	}
@@ -49,23 +43,24 @@ public class McreNlpPlayer implements Player {
 		String pr = Talk.SKIP;
 		if(gameInfo.getDay() > 0 && gameInfo.getTalkList().size() > 0)
 			pr = player.talk(); // 0日目とその日１回目のtalkはプロトコル版のtalkを呼ばない
-		String nl = mouth.toNaturalLanguageForTalk(gameInfo, coMap, pr, ear.getAnswers());
+		String nl = mouth.toNaturalLanguageForTalk(gameInfo, pr, ear.getAnswers());
 		System.out.println("　●talk: " + gameInfo.getAgent() + " " + getName() + "\t" + nl + " ( <- " + pr + " ) ");
 		return nl;
 	}
 	
 	public String whisper() {
 		String pr = player.whisper();
-		String nl = mouth.toNaturalLanguageForWhisper(gameInfo, coMap, pr);
+		String nl = mouth.toNaturalLanguageForWhisper(gameInfo, pr);
 		System.out.println("　●whis: " + gameInfo.getAgent() + " " + getName() + "\t" + nl + " ( <- " + pr + " ) ");
 		return nl;
 	}
 	
 	public void initialize(GameInfo gameInfo, GameSetting gameSetting) {
-		coMap = new HashMap<>();
 		player.initialize(gameInfo, gameSetting);
-		mouth.initialize(gameInfo);
-		ear.initialize(gameInfo);
+		
+		Estimate estimate = (Estimate)player.getSubjectiveEstimate();
+		mouth.initialize(gameInfo, estimate);
+		ear.initialize(gameInfo, estimate);
 	}
 	
 	public void dayStart() {
