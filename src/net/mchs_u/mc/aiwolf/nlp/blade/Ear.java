@@ -177,18 +177,18 @@ public class Ear{
 					Clause.findModalityClause(clauses, "勧誘") != null || // 一緒に遊ぼうよ。, 今日はAgent[01]さんに投票しましょうよ
 					Clause.findModalityClause(clauses, "意志") != null || // 今日はAgent[01]さんに投票しましょう
 					Clause.findModalityClause(clauses, "依頼Ａ") != null) { // 今日はAgent[01]さんに投票してください
-				qas.put(key, ">>" + talker + " " + talker + "さん、うーん……。");
+				qas.put(key, ">>" + talker + " " + talker + "<さん>、うーん……。");
 			}
 			
 			if(Clause.findModalityClause(clauses, "疑問") != null) {
 				if(roleClause != null && roleClause.getAiwolfWordMeaning().equals("人狼")) {
 					String main = roleClause.getKakuMap().get("ガ").getMain();
 					if(Clause.findMainClause(clauses, "誰") != null) { // 誰が人狼だと思う？
-						qas.put(key, ">>" + talker + " " + talker + "さん、僕は#さんが怪しいと思うよ。");
+						qas.put(key, ">>" + talker + " " + talker + "<さん>、<僕>は#さんが怪しいと思う<よ>。");
 					} else if(main.equals("君") || main.equals("あなた") || main.equals("御前")) { // あなたが人狼なんでしょう？, あなたが人狼なんですか！？
-						qas.put(key, ">>" + talker + " " + talker + "さん、僕は人狼じゃないよ。");
+						qas.put(key, ">>" + talker + " " + talker + "<さん>、<僕>は人狼じゃない<よ>。");
 					} else {
-						qas.put(key, ">>" + talker + " " + talker + "さん、ちょっとわからないなあ。");
+						qas.put(key, ">>" + talker + " " + talker + "<さん>、ちょっとわからない<よ>。");
 					}
 				}
 			}

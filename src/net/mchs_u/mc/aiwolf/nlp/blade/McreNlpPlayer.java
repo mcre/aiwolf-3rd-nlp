@@ -57,7 +57,7 @@ public class McreNlpPlayer implements Player {
 	public void initialize(GameInfo gameInfo, GameSetting gameSetting) {
 		player.initialize(gameInfo, gameSetting);
 		ear.initialize();
-		mouth.initialize();
+		mouth.initialize(gameInfo);
 	}
 	
 	public void dayStart() {

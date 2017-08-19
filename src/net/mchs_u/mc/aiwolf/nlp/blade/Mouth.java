@@ -1,7 +1,9 @@
 package net.mchs_u.mc.aiwolf.nlp.blade;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.aiwolf.client.lib.Content;
@@ -17,19 +19,77 @@ import net.mchs_u.mc.aiwolf.nlp.common.Transrater;
 
 public class Mouth {
 	private Set<String> talkedSet = null;
-	
 	private Agent todayVotedTarget = null;
-	
 	private McrePlayer player = null;
-	
+	private Map<String, String> c = null; // character
+
 	public Mouth(McrePlayer player) {
 		this.player = player;
+		c = new HashMap<>();
 	}
-		
-	public void initialize() {
+
+	public void initialize(GameInfo gameInfo) {
 		talkedSet = new HashSet<>();
+
+		switch (gameInfo.getAgent().getAgentIdx() % 5) {
+		case 0:
+			c.put("こんにちは。", "こんにちは。");
+			c.put("僕", "僕");
+			c.put("あなた", "きみ");
+			c.put("さん", "さん");
+			c.put("よ", "よ");
+			c.put("ね", "ね");
+			c.put("です", "です");
+			c.put("います", "いるよ");
+			c.put("なのですか", "なんですか");
+			break;
+		case 1:
+			c.put("こんにちは。", "オレが勝つ！");
+			c.put("僕", "オレ");
+			c.put("あなた", "おまえ");
+			c.put("さん", "");
+			c.put("よ", "ぜ");
+			c.put("ね", "くれ");
+			c.put("です", "だ");
+			c.put("います", "るぜ");
+			c.put("なのですか", "なのか");
+			break;
+		case 2:
+			c.put("こんにちは。", "がんばります！");
+			c.put("僕", "わたし");
+			c.put("あなた", "あなた");
+			c.put("さん", "さん");
+			c.put("よ", "わ");
+			c.put("ね", "ください");
+			c.put("です", "です");
+			c.put("います", "います");
+			c.put("なのですか", "なのですか");
+			break;
+		case 3:
+			c.put("こんにちは。", "よろしくね。");
+			c.put("僕", "あたし");
+			c.put("あなた", "あなた");
+			c.put("さん", "さん");
+			c.put("よ", "わ");
+			c.put("ね", "ね");
+			c.put("です", "だわ");
+			c.put("います", "いるわ");
+			c.put("なのですか", "なの");
+			break;
+		case 4:
+			c.put("こんにちは。", "ぼくが勝つよ！");
+			c.put("僕", "ぼく");
+			c.put("あなた", "キミ");
+			c.put("さん", "さん");
+			c.put("よ", "よ");
+			c.put("ね", "ね");
+			c.put("です", "だよ");
+			c.put("います", "いるよ");
+			c.put("なのですか", "なの");
+			break;
+		}
 	}
-	
+
 	public void dayStart() {
 		todayVotedTarget = null;
 	}
@@ -44,18 +104,12 @@ public class Mouth {
 		if(gameInfo.getDay() == 0) { //　0日目は特殊
 			if(!talkedSet.contains("0日目発言")){
 				talkedSet.add("0日目発言");
-				switch ((int)(Math.random() * 6)) {
-				case 0: return "よろしくね。";
-				case 1: return "こんにちは。";
-				case 2: return "おはよう！";
-				case 3: return "おはようございます。";
-				case 4: return "頑張ります!";
-				case 5: return "死なないように頑張ります。";
-				}
+				return r("<こんにちは。>");
 			}
 			return Talk.OVER;
 		}
 
+		Agent t = content.getTarget();
 		switch (content.getTopic()) {
 		case OVER:
 			return Talk.OVER;
@@ -65,29 +119,30 @@ public class Mouth {
 			if(!content.getTarget().equals(gameInfo.getAgent()))
 				return Talk.SKIP;
 			if(content.getRole() == Role.WEREWOLF)
-				return "わおーん、僕は人狼だよ。";
-			return "僕は" + Transrater.roleToString(content.getRole()) + "だよ。";
+				return r("わおーん、<僕>は人狼だ<よ>。");
+			return r("<僕>は" + Transrater.roleToString(content.getRole()) + "だ<よ>。");
 		case DIVINED:
 			String r = Transrater.speciesToString(content.getResult());
+			t = content.getTarget();
 			switch ((int)(Math.random() * 5)) {
-			case 0: return content.getTarget() + "さんの占い結果は、" + r + "だったよ。";
-			case 1: return content.getTarget() + "さんの占いの結果は、" + r + "だったよ。";
-			case 2: return content.getTarget() + "さんを占ったら、" + r + "だったよ。";
-			case 3: return content.getTarget() + "さんを占った結果は、" + r + "だったよ。";
-			case 4: return "昨日の占い結果だよ、" + content.getTarget() + "さんは" + r + "だったよ。";
+			case 0: return r(t + "<さん>の占い結果は、" + r + "だった<よ>。");
+			case 1: return r(t + "<さん>の占いの結果は、" + r + "だった<よ>。");
+			case 2: return r(t + "<さん>を占ったら、" + r + "だった<よ>。");
+			case 3: return r(t + "<さん>を占った結果は、" + r + "だった<よ>。");
+			case 4: return r("昨日の占い結果だ<よ>、" + t + "<さん>は" + r + "だった<よ>。");
 			}
 		case IDENTIFIED:
-			return content.getTarget() + "さんの霊能結果は、" + Transrater.speciesToString(content.getResult()) + "だったよ。";
+			return r(content.getTarget() + "<さん>の霊能結果は、" + Transrater.speciesToString(content.getResult()) + "だった<よ>。");
 		case OPERATOR:
 			Content c = content.getContentList().get(0);
 			if(c.getTopic() != Topic.VOTE)
 				return Talk.SKIP;
-			return c.getTarget() + "さんに投票してね。";
+			return r(c.getTarget() + "<さん>に投票して<ね>。");
 		case VOTE:
 			todayVotedTarget = content.getTarget();
 			switch ((int)(Math.random() * 2)) {
-			case 0: return content.getTarget() + "さんに投票するよ。";
-			case 1: return content.getTarget() + "さんに投票しようかな。";
+			case 0: return r(t + "<さん>に投票する<よ>。");
+			case 1: return r(t + "<さん>に投票しようかな。");
 			}
 		default:
 			return Talk.SKIP;
@@ -99,7 +154,7 @@ public class Mouth {
 			if(!talkedSet.contains("パワープレイ反応")){
 				talkedSet.add("パワープレイ反応");
 				if(gameInfo.getRole() == Role.WEREWOLF) { // 人狼
-					return "食べちゃうぞー！";
+					return r("食べちゃう<よ>ー！");
 				} else if(gameInfo.getRole() == Role.POSSESSED) { // 狂人
 					return "うひゃひゃひゃひゃひゃひゃひゃ！";
 				} else { // 村人チーム
@@ -115,8 +170,7 @@ public class Mouth {
 				talkedSet.add("襲撃反応");
 				switch ((int)(Math.random() * 5)) {
 				case 0: return "本当に襲われるなんて……。";
-				case 1: return gameInfo.getLastDeadAgentList().get(0) + "さん……。";
-				case 2: return "死んじゃった……。";
+				case 1: return r(gameInfo.getLastDeadAgentList().get(0) + "<さん>が死んだ……。");
 				}
 			}
 		}
@@ -128,16 +182,16 @@ public class Mouth {
 					Set<Agent> coSeers = getEstimate().getCoSet(Role.SEER);
 					coSeers.remove(gameInfo.getAgent());
 					Agent t = (Agent)coSeers.toArray()[0];
-					
+
 					switch ((int)(Math.random() * 5)) {
-					case 0: return t + "さんは嘘をついています！";
-					case 1: return t + "さんは嘘つきです！";
-					case 2: return ">>" + t + " " + t + "さん、あなたが人狼なんですか！？";
+					case 0: return r(t + "<さん>は嘘をついて<います>！");
+					case 1: return r(t + "<さん>は嘘つき<です>！");
+					case 2: return r(">>" + t + " " + t + "<さん>、<あなた>が人狼<なのですか>！？");
 					}
 				}
 			}
 		}
-		
+
 		// COしてない人
 		if(getEstimate().getCoSet(Role.SEER).size() == 2) { //二人COしているとき
 			if(!talkedSet.contains("二人占い師反応")){
@@ -147,20 +201,27 @@ public class Mouth {
 				}
 			}
 		}
-		
+
 		for(String answer: answers) { //Earから渡されたAnswer
 			if(!talkedSet.contains("answer:" + answer)){
 				talkedSet.add("answer:" + answer);
 				if(todayVotedTarget != null) {
 					if(answer.startsWith(">>" + todayVotedTarget + " "))
-						return answer.replace("#さん", "あなた");
+						return r(answer.replace("#<さん>", "<あなた>"));
 					else
-						return answer.replace("#", todayVotedTarget.toString());
+						return r(answer.replace("#", todayVotedTarget.toString()));
 				}
 			}
 		}
-		
+
 		return Talk.SKIP;
+	}
+
+	public String r(String s) { // replace
+		String ret = s;
+		for(String key: c.keySet())
+			ret = ret.replace("<" + key + ">", c.get(key));
+		return ret;
 	}
 
 	public String toNaturalLanguageForWhisper(GameInfo gameInfo, String protocol) {		
@@ -177,15 +238,15 @@ public class Mouth {
 			return Talk.SKIP;
 		case COMINGOUT:
 			if(content.getTarget().equals(gameInfo.getAgent()) && content.getRole() == Role.VILLAGER)
-				return "僕は潜伏するよ。";
+				return r("<僕>は潜伏する<よ>。");
 			return Talk.SKIP;
 		case ATTACK:
-			return content.getTarget() + "を襲撃するよ。"; 
+			return r(content.getTarget() + "を襲撃する<よ>。");
 		default:
 			return Talk.SKIP;
 		}
 	}
-	
+
 	private Estimate getEstimate() {
 		return (Estimate)player.getPretendVillagerEstimate();
 	}

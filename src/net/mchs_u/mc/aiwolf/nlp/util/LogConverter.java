@@ -136,11 +136,11 @@ public class LogConverter {
 
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		List<String> names = new ArrayList<>();
-		names.add("アンパンマン");
 		names.add("ばいきんまん");
-		names.add("カレーパンマン");
+		names.add("エクレアさん");
 		names.add("ドキンちゃん");
 		names.add("しょくぱんまん");
+		names.add("アンパンマン");
 		File logDir = new File("log");
 		String[] files = logDir.list(new FilenameFilter(){
 			@Override
