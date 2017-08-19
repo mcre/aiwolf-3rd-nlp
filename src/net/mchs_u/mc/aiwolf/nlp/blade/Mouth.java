@@ -1,4 +1,4 @@
-package net.mchs_u.mc.aiwolf.nlp.agito;
+package net.mchs_u.mc.aiwolf.nlp.blade;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

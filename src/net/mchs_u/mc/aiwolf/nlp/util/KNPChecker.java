@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mychaelstyle.nlp.KNP;
 
-import net.mchs_u.mc.aiwolf.nlp.agito.Clause;
+import net.mchs_u.mc.aiwolf.nlp.blade.Clause;
 
 public class KNPChecker {
 	

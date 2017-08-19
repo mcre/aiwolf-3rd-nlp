@@ -1,4 +1,4 @@
-package net.mchs_u.mc.aiwolf.nlp.agito;
+package net.mchs_u.mc.aiwolf.nlp.blade;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,7 +23,7 @@ public class McreNlpPlayer implements Player {
 	private Map<Agent, Role> coMap = null;
 
 	public McreNlpPlayer() {
-		player = new net.mchs_u.mc.aiwolf.curry.McrePlayer();
+		player = new net.mchs_u.mc.aiwolf.dokin.McrePlayer();
 		ear = new Ear();
 		mouth = new Mouth();
 	}

@@ -12,7 +12,7 @@ import org.aiwolf.server.AIWolfGame;
 import org.aiwolf.server.net.TcpipServer;
 import org.aiwolf.server.util.FileGameLogger;
 
-import net.mchs_u.mc.aiwolf.nlp.agito.McreNlpPlayer;
+import net.mchs_u.mc.aiwolf.nlp.blade.McreNlpPlayer;
 import net.mchs_u.mc.aiwolf.nlp.human.HumanPlayer;
 
 public class Starter {

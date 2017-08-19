@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import net.mchs_u.mc.aiwolf.nlp.agito.Ear;
+import net.mchs_u.mc.aiwolf.nlp.blade.Ear;
 
 public class TransratedMapChecker {
 	public static void main(String[] args) {

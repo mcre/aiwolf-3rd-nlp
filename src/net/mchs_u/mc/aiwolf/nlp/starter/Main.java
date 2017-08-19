@@ -8,8 +8,8 @@ public class Main {
 		int gameNum = 1;
 		
 		String type = null;
-		//type = "ローカル*5";
-		type = "ローカル*4 + 人間*1";
+		type = "ローカル*5";
+		//type = "ローカル*4 + 人間*1";
 		//type = "大会5人接続";
 		//type = "大会1人接続";
 				
@@ -27,10 +27,10 @@ public class Main {
 			break;
 		case "大会5人接続":
 			for(int i = 0; i < 4; i++)
-				Starter.startAIClient("kanolab.net", 10000);
+				Starter.startAIClient("kachako.org", 10001);
 			break;
 		case "大会1人接続":
-			Starter.startAIClient("kanolab.net", 10000);
+			Starter.startAIClient("kachako.org", 10001);
 			break;
 		}
 		
