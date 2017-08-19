@@ -20,6 +20,8 @@ public class Mouth {
 	private Set<String> talkedSet = null;
 	private McrePlayer player = null;
 	private Map<String, String> c = null; // character
+	
+	private boolean firstVoted = false;
 
 	public Mouth(McrePlayer player) {
 		this.player = player;
@@ -28,6 +30,7 @@ public class Mouth {
 	public void initialize(GameInfo gameInfo) {
 		talkedSet = new HashSet<>();
 		c = Character.getCharactorMap(gameInfo.getAgent().getAgentIdx());
+		firstVoted = false;
 	}
 
 	public void dayStart() {
@@ -78,10 +81,14 @@ public class Mouth {
 				return Talk.SKIP;
 			return r(c.getTarget() + "<さん>に投票して<ね>。");
 		case VOTE:
-			switch ((int)(Math.random() * 2)) {
-			case 0: return r(t + "<さん>に投票する<よ>。");
-			case 1: return r(t + "<さん>に投票しようかな。");
+			// 1回目の投票宣言は何も情報がない中での宣言なのでスルーする
+			if(firstVoted) {
+				switch ((int)(Math.random() * 2)) {
+				case 0: return r(t + "<さん>に投票する<よ>。");
+				case 1: return r(t + "<さん>に投票しようかな。");
+				}
 			}
+			firstVoted = true;
 		default:
 			return Talk.SKIP;
 		}
