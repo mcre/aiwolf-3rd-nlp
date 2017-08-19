@@ -18,7 +18,6 @@ import net.mchs_u.mc.aiwolf.nlp.common.Transrater;
 
 public class Mouth {
 	private Set<String> talkedSet = null;
-	private Agent todayVotedTarget = null;
 	private McrePlayer player = null;
 	private Map<String, String> c = null; // character
 
@@ -32,7 +31,6 @@ public class Mouth {
 	}
 
 	public void dayStart() {
-		todayVotedTarget = null;
 	}
 
 	public String toNaturalLanguageForTalk(GameInfo gameInfo, String protocol, Collection<String> answers) {
@@ -80,7 +78,6 @@ public class Mouth {
 				return Talk.SKIP;
 			return r(c.getTarget() + "<さん>に投票して<ね>。");
 		case VOTE:
-			todayVotedTarget = content.getTarget();
 			switch ((int)(Math.random() * 2)) {
 			case 0: return r(t + "<さん>に投票する<よ>。");
 			case 1: return r(t + "<さん>に投票しようかな。");
@@ -146,19 +143,21 @@ public class Mouth {
 		for(String answer: answers) { //Earから渡されたAnswer
 			if(!talkedSet.contains("answer:" + answer)){
 				talkedSet.add("answer:" + answer);
-				if(todayVotedTarget != null) {
-					if(answer.startsWith(">>" + todayVotedTarget + " "))
+				
+				Agent voteTarget = player.getVoteTarget();
+				if(voteTarget != null) {
+					if(answer.startsWith(">>" + voteTarget + " "))
 						return r(answer.replace("#<さん>", "<あなた>"));
 					else
-						return r(answer.replace("#", todayVotedTarget.toString()));
+						return r(answer.replace("#", voteTarget.toString()));
 				}
 			}
 		}
 
 		return Talk.SKIP;
 	}
-
-	public String r(String s) { // replace
+	
+	private String r(String s) { // replace
 		String ret = s;
 		for(String key: c.keySet())
 			ret = ret.replace("<" + key + ">", c.get(key));
