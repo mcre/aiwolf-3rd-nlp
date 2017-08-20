@@ -212,32 +212,36 @@ public class Clause {
 		return negative;
 	}
 	
-	public static Clause findMainClause(List<Clause> clauses, String main) {
+	public static List<Clause> findMainClauses(List<Clause> clauses, String main) {
+		List<Clause> ret = new ArrayList<>();
 		for(Clause clause: clauses)
 			if(clause.main.equals(main))
-				return clause;
-		return null;
+				ret.add(clause);
+		return ret;
 	}
 	
-	public static Clause findModalityClause(List<Clause> clauses, String modality) {
+	public static List<Clause> findModalityClauses(List<Clause> clauses, String modality) {
+		List<Clause> ret = new ArrayList<>();
 		for(Clause clause: clauses)
 			if(clause.modalities.contains(modality))
-				return clause;
-		return null;
+				ret.add(clause);
+		return ret;
 	}	
 	
-	public static Clause findAttributeClause(List<Clause> clauses, String attribute) {
+	public static List<Clause> findAttributeClauses(List<Clause> clauses, String attribute) {
+		List<Clause> ret = new ArrayList<>();
 		for(Clause clause: clauses)
 			if(clause.attributes.contains(attribute))
-				return clause;
-		return null;
+				ret.add(clause);
+		return ret;
 	}
 	
-	public static Clause findAiwolfTypeClause(List<Clause> clauses, String type) {
+	public static List<Clause> findAiwolfTypeClauses(List<Clause> clauses, String type) {
+		List<Clause> ret = new ArrayList<>();
 		for(Clause clause: clauses)
 			if(clause.aiwolfWordType != null && clause.aiwolfWordType.equals(type))
-				return clause;
-		return null;
+				ret.add(clause);
+		return ret;
 	}
 
 	@Override
@@ -333,6 +337,7 @@ public class Clause {
 		//talk = "君が犯人なんだろう？";
 		//talk = "Agent[01]に投票しようかな";
 		talk = "Ａｇｅｎｔ［０１］は人狼でした";
+		talk = "僕は占い師です。Ａｇｅｎｔ［０１］は人狼だよ。";
 
 		
 		List<Clause> list = Clause.createClauses(talk);

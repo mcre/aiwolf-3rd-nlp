@@ -9,13 +9,17 @@ import net.mchs_u.mc.aiwolf.nlp.blade.Ear;
 
 public class TransratedMapChecker {
 	public static void main(String[] args) {
-		Map<String, String> transratedMap = Ear.load(); 
+		Map<String, List<String>> transratedMap = Ear.load(); 
 
 		List<String> keys = new ArrayList<>(transratedMap.keySet());
 		Collections.sort(keys);
 		
 		for(String k: keys) {
-			System.out.println(k + " -> " + transratedMap.get(k));
+			List<String> values = transratedMap.get(k);
+			System.out.print(k + " -> ");
+			for(String v: values)
+				System.out.print(v + ", ");
+			System.out.println();
 		}
 	}
 }

@@ -1,7 +1,5 @@
 package net.mchs_u.mc.aiwolf.nlp.blade;
 
-import java.util.List;
-
 import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.data.Player;
 import org.aiwolf.common.data.Talk;
@@ -16,7 +14,7 @@ public class McreNlpPlayer implements Player {
 	private GameInfo gameInfo = null;
 	private Mouth mouth;
 	private Ear ear;
-	private int listHead; // トークをどこまでprint/処理したかの管理
+	//private int listHead; // トークをどこまでprint/処理したかの管理
 
 	public McreNlpPlayer() {
 		player = new net.mchs_u.mc.aiwolf.dokin.McrePlayer();
@@ -29,13 +27,14 @@ public class McreNlpPlayer implements Player {
 		GameInfo prGameInfo = new GameInfoTranslater(gameInfo, ear);
 		player.update(prGameInfo);
 		
+		/* talkListとprTalkListの数の不整合でエラーが出るので一旦消す
 		List<Talk> talkList = gameInfo.getTalkList();
 		List<Talk> prTalkList = prGameInfo.getTalkList();
-		
-		for(int i = listHead; i < talkList.size(); i++){
+		for(int i = listHead; i < prTalkList.size(); i++){
 			System.out.println("　○log : " + gameInfo.getAgent() + " " + getName() + "\t" + talkList.get(i) + " ( -> " + prTalkList.get(i).getText() + " ) ");
 			listHead++;
 		}
+		*/
 	}
 	
 	public String talk() {
@@ -61,7 +60,7 @@ public class McreNlpPlayer implements Player {
 	}
 	
 	public void dayStart() {
-		listHead = 0;
+		//listHead = 0;
 		player.dayStart();
 		mouth.dayStart();
 		ear.dayStart();

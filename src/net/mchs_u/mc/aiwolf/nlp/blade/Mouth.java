@@ -60,8 +60,15 @@ public class Mouth {
 		case COMINGOUT:
 			if(!content.getTarget().equals(gameInfo.getAgent()))
 				return Talk.SKIP;
-			if(content.getRole() == Role.WEREWOLF)
-				return r("わおーん、<僕>は人狼だ<よ>。");
+			if(content.getRole() == Role.WEREWOLF) {
+				if(getEstimate().isPowerPlay()) // もうPPされてる場合
+					return r("わおーん、<僕>は人狼だ<よ>。");
+				else // PP発動する場合
+					return r("もう<僕>たちのほうが多いよう<だね>。わおーん、<僕>は人狼だ<よ>。");
+			}
+			if(content.getRole() == Role.POSSESSED) {
+				return r("ふふふふ、<僕>が狂人だ<よ>！");
+			}
 			return r("<僕>は" + Transrater.roleToString(content.getRole()) + "だ<よ>。");
 		case DIVINED:
 			String r = Transrater.speciesToString(content.getResult());
@@ -135,10 +142,11 @@ public class Mouth {
 					coSeers.remove(gameInfo.getAgent());
 					Agent t = (Agent)coSeers.toArray()[0];
 
-					switch ((int)(Math.random() * 5)) {
+					switch ((int)(Math.random() * 6)) {
 					case 0: return r(t + "<さん>は嘘をついて<います>！　<僕>が本当の占い師<です>！");
 					case 1: return r(t + "<さん>は偽物<です>！　<僕>こそが本当の占い師<です>！");
 					case 2: return r(">>" + t + " " + t + "<さん>、<あなた>が人狼<なのですか>！？");
+					case 3: return r(">>" + t + " " + t + "<さん>、<あなた>は狂人<なのですか>！？");
 					}
 				}
 			}

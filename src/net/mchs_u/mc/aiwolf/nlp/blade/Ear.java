@@ -5,8 +5,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,7 +33,7 @@ import net.mchs_u.mc.aiwolf.dokin.McrePlayer;
 public class Ear{
 	private static final String DAT_FILE = "dic/translatedMap.dat";
 
-	private Map<String, String> translatedMap = null; 
+	private Map<String, List<String>> translatedMap = null; 
 	private Map<String, String> qas = null; // Mouthに渡すQA集
 	
 	@SuppressWarnings("unused")
@@ -49,9 +51,9 @@ public class Ear{
 		qas = new HashMap<>();
 	}
 	
-	public String toProtocolForTalk(GameInfo gameInfo, Agent talker, String naturalLanguage) {
+	public List<String> toProtocolsForTalk(GameInfo gameInfo, Agent talker, String naturalLanguage) {
 		String key = talker + ":" + naturalLanguage;
-		String ret = Talk.SKIP;
+		List<String> ret = new ArrayList<>();
 		try {			
 			Agent questionTo = null;
 			if(naturalLanguage.startsWith(">>Agent["))
@@ -61,11 +63,11 @@ public class Ear{
 				if(questionTo != gameInfo.getAgent() || qas.containsKey(key)) // 自分宛ての問いかけでない場合か、QA履歴にある場合
 					return translatedMap.get(key); // 履歴から返す
 			} else if(naturalLanguage.contains(Talk.SKIP)) {
-				translatedMap.put(key, Talk.SKIP);
-				return Talk.SKIP;
+				ret.add(Talk.SKIP);
+				return ret;
 			} else if(naturalLanguage.contains(Talk.OVER)) {
-				translatedMap.put(key, Talk.OVER);
-				return Talk.OVER;
+				ret.add(Talk.OVER);
+				return ret;
 			}
 			
 			String nl = naturalLanguage;
@@ -73,132 +75,152 @@ public class Ear{
 			nl = nl.replaceFirst("^>>Agent\\[..\\] ", "");
 			nl = hankakuToZenkaku(nl);
 			
-			Content content = talkToContent(gameInfo, talker, questionTo, key, Clause.createClauses(nl));
-			if(content == null)
-				ret = Talk.SKIP;
+			List<String> contents = talkToContents(gameInfo, talker, questionTo, key, Clause.createClauses(nl));
+			if(contents == null)
+				ret.add(Talk.SKIP);
 			else
-				ret = content.getText();
+				ret = contents;
 		} catch(Exception e) {
-			e.printStackTrace();
-			ret = Talk.SKIP;
+			ret.add(Talk.SKIP);
 		}
 		
 		translatedMap.put(key, ret);
 		return ret;
 	}
 	
-	private Content talkToContent(GameInfo gameInfo, Agent talker, Agent questionTo, String key, List<Clause> clauses) {
-		Clause roleClause   = Clause.findAiwolfTypeClause(clauses, "役職");
-		Clause roleCoClause = Clause.findAiwolfTypeClause(clauses, "役職CO");
-		Clause actionClause = Clause.findAiwolfTypeClause(clauses, "行為");
-		Clause playerClause = Clause.findAiwolfTypeClause(clauses, "プレイヤー");
+	private List<String> talkToContents(GameInfo gameInfo, Agent talker, Agent questionTo, String key, List<Clause> clauses) {
+		List<Clause> roleClauses   = Clause.findAiwolfTypeClauses(clauses, "役職");
+		List<Clause> roleCoClauses = Clause.findAiwolfTypeClauses(clauses, "役職CO");
+		List<Clause> actionClauses = Clause.findAiwolfTypeClauses(clauses, "行為");
+		List<Clause> playerClauses = Clause.findAiwolfTypeClauses(clauses, "プレイヤー");
 		Clause tmp = null;
 		
-		if(playerClause != null && roleClause != null && actionClause != null) {
-			// ☆占い結果「Agent[04]さんを占ったら人狼でした」「昨日の占い結果です。Agent[04]さんは人狼でした」
-			// 一文に、プレイヤー、占い、人＊でした、があれば占い結果とする
-			if(
-					actionClause.getAiwolfWordMeaning().equals("占い") &&
-					roleClause.getAiwolfWordMeaning().startsWith("人") &&
-					roleClause.getAttributes().contains("状態述語") &&
-					!actionClause.isNegative() && !roleClause.isNegative()) {
-				Agent target = Agent.getAgent(Integer.parseInt(playerClause.getAiwolfWordMeaning()));
-				switch (roleClause.getAiwolfWordMeaning()) {
-				case "人狼":		return new Content(new DivinedResultContentBuilder(target, Species.WEREWOLF));
-				case "人間":		return new Content(new DivinedResultContentBuilder(target, Species.HUMAN));
+		List<Content> contents = new ArrayList<>();
+				
+		for(Clause roleCoClause: roleCoClauses) {
+			if(!roleCoClause.isNegative()) {
+				// ☆役職CO「占い師COします」
+				if(roleCoClause.getAttributes().contains("動態述語")) {
+					switch (roleCoClause.getAiwolfWordMeaning()) {
+					case "占い師":	contents.add(new Content(new ComingoutContentBuilder(talker, Role.SEER))); break;
+					case "人狼":		contents.add(new Content(new ComingoutContentBuilder(talker, Role.WEREWOLF))); break;
+					case "狂人":		contents.add(new Content(new ComingoutContentBuilder(talker, Role.POSSESSED))); break;
+					case "人間":		contents.add(new Content(new ComingoutContentBuilder(talker, Role.VILLAGER))); break;
+					}
 				}
 			}
 		}
 		
-		if(roleClause != null && !roleClause.isNegative()) {				
-			// ☆役職CO「私は占い師です」
-			tmp = roleClause.getKakuMap().get("ガ");
-			if(tmp != null && tmp.getAttributes().contains("一人称")) {
-				switch (roleClause.getAiwolfWordMeaning()) {
-				case "占い師":	return new Content(new ComingoutContentBuilder(talker, Role.SEER));
-				case "人狼":		return new Content(new ComingoutContentBuilder(talker, Role.WEREWOLF));
-				case "狂人":		return new Content(new ComingoutContentBuilder(talker, Role.POSSESSED));
-				case "人間":		return new Content(new ComingoutContentBuilder(talker, Role.VILLAGER));
-				}
-			}
-			
-			// ☆占い結果「Agent[04]さんは人狼です」
-			tmp = roleClause.getKakuMap().get("ガ");
-			Clause child = roleClause.getChild();
-			if(tmp != null && tmp.getAiwolfWordType() != null && 
-					tmp.getAiwolfWordType().equals("プレイヤー") && 
-					!roleClause.getModalities().contains("疑問") &&
-					!(child != null && child.getMain().equals("思う"))) { // 「人狼だと思う」の回避
-				Agent target = Agent.getAgent(Integer.parseInt(tmp.getAiwolfWordMeaning()));
-				switch (roleClause.getAiwolfWordMeaning()) {
-				case "人狼":		return new Content(new DivinedResultContentBuilder(target, Species.WEREWOLF));
-				case "人間":		return new Content(new DivinedResultContentBuilder(target, Species.HUMAN));
-				}
-			}
-		}
-			
-		if(roleCoClause != null && !roleCoClause.isNegative()) {
-			// ☆役職CO「占い師COします」
-			if(roleCoClause.getAttributes().contains("動態述語")) {
-				switch (roleCoClause.getAiwolfWordMeaning()) {
-				case "占い師":	return new Content(new ComingoutContentBuilder(talker, Role.SEER));
-				case "人狼":		return new Content(new ComingoutContentBuilder(talker, Role.WEREWOLF));
-				case "狂人":		return new Content(new ComingoutContentBuilder(talker, Role.POSSESSED));
-				case "人間":		return new Content(new ComingoutContentBuilder(talker, Role.VILLAGER));
-				}
-			}
-		}
-			
-		if(actionClause != null && !actionClause.isNegative()) {
-			if(actionClause.getAiwolfWordMeaning().equals("投票")) {
-				// ☆投票依頼「Agent[04]さんに投票してください」
-				Set<String> m = actionClause.getModalities();
-				if((m.contains("依頼Ａ") || m.contains("勧誘")) && !m.contains("意志")) {
-					int agentId = -1;
-					tmp = actionClause.getKakuMap().get("ニ");
-					if(tmp != null && tmp.getAiwolfWordType().equals("プレイヤー"))
-						agentId = Integer.parseInt(tmp.getAiwolfWordMeaning());
-					
-					tmp = actionClause.getKakuMap().get("ヲ");
-					if(tmp != null && tmp.getAiwolfWordType().equals("プレイヤー"))
-						agentId = Integer.parseInt(tmp.getAiwolfWordMeaning());
-						
-					if(agentId >= 0) {
-						Agent target = Agent.getAgent(agentId);
-						if(target != null)	
-							return new Content(new RequestContentBuilder(null, new Content(new VoteContentBuilder(target))));
+		for(Clause roleClause: roleClauses) {
+			if(!roleClause.isNegative()) {				
+				// ☆役職CO「私は占い師です」
+				tmp = roleClause.getKakuMap().get("ガ");
+				if(tmp != null && tmp.getAttributes().contains("一人称")) {
+					switch (roleClause.getAiwolfWordMeaning()) {
+					case "占い師":	contents.add(new Content(new ComingoutContentBuilder(talker, Role.SEER))); break;
+					case "人狼":		contents.add(new Content(new ComingoutContentBuilder(talker, Role.WEREWOLF))); break;
+					case "狂人":		contents.add(new Content(new ComingoutContentBuilder(talker, Role.POSSESSED))); break;
+					case "人間":		contents.add(new Content(new ComingoutContentBuilder(talker, Role.VILLAGER))); break;
 					}
-				}	
+				}
+				
+				// ☆占い結果「Agent[04]さんは人狼です」
+				tmp = roleClause.getKakuMap().get("ガ");
+				Clause child = roleClause.getChild();
+				if(tmp != null && tmp.getAiwolfWordType() != null && 
+						tmp.getAiwolfWordType().equals("プレイヤー") && 
+						!roleClause.getModalities().contains("疑問") &&
+						!(child != null && child.getMain().equals("思う"))) { // 「人狼だと思う」の回避
+					Agent target = Agent.getAgent(Integer.parseInt(tmp.getAiwolfWordMeaning()));
+					switch (roleClause.getAiwolfWordMeaning()) {
+					case "人狼":	contents.add(new Content(new DivinedResultContentBuilder(target, Species.WEREWOLF))); break;
+					case "人間":	contents.add(new Content(new DivinedResultContentBuilder(target, Species.HUMAN))); break;
+					}
+				}
 			}
 		}
+		
+		for(Clause playerClause: playerClauses) {
+			for(Clause roleClause: roleClauses) {
+				for(Clause actionClause: actionClauses) {
+					if(
+							actionClause.getAiwolfWordMeaning().equals("占い") &&
+							roleClause.getAiwolfWordMeaning().startsWith("人") &&
+							roleClause.getAttributes().contains("状態述語") &&
+							!actionClause.isNegative() && !roleClause.isNegative()) {
+						Agent target = Agent.getAgent(Integer.parseInt(playerClause.getAiwolfWordMeaning()));
+						switch (roleClause.getAiwolfWordMeaning()) {
+						case "人狼":	contents.add(new Content(new DivinedResultContentBuilder(target, Species.WEREWOLF))); break;
+						case "人間":	contents.add(new Content(new DivinedResultContentBuilder(target, Species.HUMAN))); break;
+						}
+					}
+				}
+			}
+		}
+		
+		for(Clause actionClause: actionClauses) {
+			if(!actionClause.isNegative()) {
+				if(actionClause.getAiwolfWordMeaning().equals("投票")) {
+					// ☆投票依頼「Agent[04]さんに投票してください」
+					Set<String> m = actionClause.getModalities();
+					if((m.contains("依頼Ａ") || m.contains("勧誘")) && !m.contains("意志")) {
+						int agentId = -1;
+						tmp = actionClause.getKakuMap().get("ニ");
+						if(tmp != null && tmp.getAiwolfWordType().equals("プレイヤー"))
+							agentId = Integer.parseInt(tmp.getAiwolfWordMeaning());
+						
+						tmp = actionClause.getKakuMap().get("ヲ");
+						if(tmp != null && tmp.getAiwolfWordType().equals("プレイヤー"))
+							agentId = Integer.parseInt(tmp.getAiwolfWordMeaning());
+							
+						if(agentId >= 0) {
+							Agent target = Agent.getAgent(agentId);
+							if(target != null)	
+								contents.add(new Content(new RequestContentBuilder(null, new Content(new VoteContentBuilder(target)))));
+						}
+					}	
+				}
+			}
+		}
+			
 		
 		if(questionTo == gameInfo.getAgent()) { // 自分宛て問いかけの場合
 			if(
-					Clause.findModalityClause(clauses, "勧誘") != null || // 一緒に遊ぼうよ。, 今日はAgent[01]さんに投票しましょうよ
-					Clause.findModalityClause(clauses, "意志") != null || // 今日はAgent[01]さんに投票しましょう
-					Clause.findModalityClause(clauses, "依頼Ａ") != null) { // 今日はAgent[01]さんに投票してください
+					Clause.findModalityClauses(clauses, "勧誘").size() > 0 || // 一緒に遊ぼうよ。, 今日はAgent[01]さんに投票しましょうよ
+					Clause.findModalityClauses(clauses, "意志").size() > 0 || // 今日はAgent[01]さんに投票しましょう
+					Clause.findModalityClauses(clauses, "依頼Ａ").size() > 0) { // 今日はAgent[01]さんに投票してください
 				qas.put(key, ">>" + talker + " " + talker + "<さん>、うーん……。");
 			}
 			
-			if(Clause.findModalityClause(clauses, "疑問") != null) {
-				if(roleClause != null && roleClause.getAiwolfWordMeaning().equals("人狼")) {
-					String main = roleClause.getKakuMap().get("ガ").getMain();
-					if(Clause.findMainClause(clauses, "誰") != null) { // 誰が人狼だと思う？
-						qas.put(key, ">>" + talker + " " + talker + "<さん>、<僕>は#さんが怪しいと思う<よ>。");
-					} else if(main.equals("君") || main.equals("あなた") || main.equals("御前")) { // あなたが人狼なんでしょう？, あなたが人狼なんですか！？
-						qas.put(key, ">>" + talker + " " + talker + "<さん>、<僕>は人狼じゃない<よ>。");
-					} else {
-						qas.put(key, ">>" + talker + " " + talker + "<さん>、ちょっとわからない<よ>。");
+			// 2文のときにうまく対応できないかも(そのうちちゃんと調べたい)
+			if(Clause.findModalityClauses(clauses, "疑問").size() > 0) {
+				for(Clause roleClause: roleClauses) {
+					if(roleClause.getAiwolfWordMeaning().equals("人狼")) {
+						String main = roleClause.getKakuMap().get("ガ").getMain();
+						if(Clause.findMainClauses(clauses, "誰").size() > 0) { // 誰が人狼だと思う？
+							qas.put(key, ">>" + talker + " " + talker + "<さん>、<僕>は#さんが怪しいと思う<よ>。");
+						} else if(main.equals("君") || main.equals("あなた") || main.equals("御前")) { // あなたが人狼なんでしょう？, あなたが人狼なんですか！？
+							qas.put(key, ">>" + talker + " " + talker + "<さん>、<僕>は人狼じゃない<よ>。");
+						} else {
+							qas.put(key, ">>" + talker + " " + talker + "<さん>、ちょっとわからない<よ>。");
+						}
 					}
 				}
 			}
 		}
 		
-		return null;
+		List<String> ret = new ArrayList<>();
+		for(Content content: contents) {
+			ret.add(content.getText());
+		}
+		
+		return new ArrayList<String>(new LinkedHashSet<>(ret)); // 重複削除
 	}
 	
-	public String toProtocolForWhisper(GameInfo gameInfo, Agent talker, String naturalLanguage) {		
-		return Talk.SKIP;
+	public List<String> toProtocolsForWhisper(GameInfo gameInfo, Agent talker, String naturalLanguage) {
+		List<String> ret = new ArrayList<>();
+		ret.add(Talk.SKIP);
+		return ret;
 	}
 	
 	// juman辞書に半角文字登録できなさそうなので
@@ -227,12 +249,12 @@ public class Ear{
 	}
 
 	@SuppressWarnings("unchecked")
-	public static Map<String, String> load() {
-		Map<String, String> ret = null;
+	public static Map<String, List<String>> load() {
+		Map<String, List<String>> ret = null;
 		ObjectInputStream ois = null;
 		try {
 			ois = new ObjectInputStream(new FileInputStream(DAT_FILE));
-			ret = (Map<String, String>)ois.readObject();
+			ret = (Map<String, List<String>>)ois.readObject();
 		} catch (IOException | ClassNotFoundException e) {
 			ret = new HashMap<>();
 		} finally {
@@ -241,7 +263,7 @@ public class Ear{
 		return ret;
 	}
 
-	private static void save(Map<String, String> map) {
+	private static void save(Map<String, List<String>> map) {
 		ObjectOutputStream oos = null;
 		try {
 			oos = new ObjectOutputStream(new FileOutputStream(DAT_FILE));
