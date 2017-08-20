@@ -189,7 +189,7 @@ public class Ear{
 					Clause.findModalityClauses(clauses, "勧誘").size() > 0 || // 一緒に遊ぼうよ。, 今日はAgent[01]さんに投票しましょうよ
 					Clause.findModalityClauses(clauses, "意志").size() > 0 || // 今日はAgent[01]さんに投票しましょう
 					Clause.findModalityClauses(clauses, "依頼Ａ").size() > 0) { // 今日はAgent[01]さんに投票してください
-				qas.put(key, ">>" + talker + " " + talker + "<さん>、うーん……。");
+				qas.put(key, ">>" + talker + " " + talker + "<さん>、うーん、そのお願いどうしようかな……。");
 			}
 			
 			// 2文のときにうまく対応できないかも(そのうちちゃんと調べたい)
@@ -202,7 +202,7 @@ public class Ear{
 						} else if(main.equals("君") || main.equals("あなた") || main.equals("御前")) { // あなたが人狼なんでしょう？, あなたが人狼なんですか！？
 							qas.put(key, ">>" + talker + " " + talker + "<さん>、<僕>は人狼じゃない<よ>。");
 						} else {
-							qas.put(key, ">>" + talker + " " + talker + "<さん>、ちょっとわからない<よ>。");
+							qas.put(key, ">>" + talker + " " + talker + "<さん>、その質問はちょっとわからない<よ>。");
 						}
 					}
 				}
