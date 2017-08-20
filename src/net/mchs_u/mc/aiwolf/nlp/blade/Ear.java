@@ -189,7 +189,7 @@ public class Ear{
 					Clause.findModalityClauses(clauses, "勧誘").size() > 0 || // 一緒に遊ぼうよ。, 今日はAgent[01]さんに投票しましょうよ
 					Clause.findModalityClauses(clauses, "意志").size() > 0 || // 今日はAgent[01]さんに投票しましょう
 					Clause.findModalityClauses(clauses, "依頼Ａ").size() > 0) { // 今日はAgent[01]さんに投票してください
-				qas.put(key, ">>" + talker + " " + talker + "<さん>、うーん、そのお願いどうしようかな……。");
+				qas.put(key, ">>" + talker + " " + talker + "<さん>、うーん、そのお願いはどうしようかな……。");
 			}
 			
 			// 2文のときにうまく対応できないかも(そのうちちゃんと調べたい)
