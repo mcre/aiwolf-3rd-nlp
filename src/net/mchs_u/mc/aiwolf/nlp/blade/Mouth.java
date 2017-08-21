@@ -1,7 +1,11 @@
 package net.mchs_u.mc.aiwolf.nlp.blade;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -9,14 +13,18 @@ import org.aiwolf.client.lib.Content;
 import org.aiwolf.client.lib.Topic;
 import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.data.Role;
+import org.aiwolf.common.data.Species;
 import org.aiwolf.common.data.Talk;
 import org.aiwolf.common.net.GameInfo;
 
+import net.mchs_u.mc.aiwolf.common.AgentTargetResult;
 import net.mchs_u.mc.aiwolf.dokin.Estimate;
 import net.mchs_u.mc.aiwolf.dokin.McrePlayer;
 import net.mchs_u.mc.aiwolf.nlp.common.Transrater;
 
 public class Mouth {
+	private static final double EPS =  0.00001d;
+	
 	private Set<String> talkedSet = null;
 	private McrePlayer player = null;
 	private Map<String, String> c = null; // character
@@ -96,10 +104,9 @@ public class Mouth {
 			}
 			// 1回目の投票宣言は何も情報がない中での宣言なのでスルーする
 			if(firstVoted) {
-				switch ((int)(Math.random() * 3)) {
-				case 0: return r(t + "<さん>があやしい<よ>。");
-				case 1: return r(t + "<さん>が人狼だと思う<よ>。");
-				case 2: return r(t + "<さん>が一番おかしいと思う<よ>。");
+				switch ((int)(Math.random() * 2)) {
+				case 0: return r(t + "<さん>があやしいと思うから投票する<よ>。");
+				case 1: return r(t + "<さん>が人狼だと思うから投票する<よ>。");
 				}
 			}
 			firstVoted = true;
@@ -107,8 +114,90 @@ public class Mouth {
 			return Talk.SKIP;
 		}
 	}
+	
+	private static String agentsToTalk(GameInfo gameInfo, Collection<Agent> agents, char conj) {
+		String ret = "";
+		for(Agent agent: agents)
+			ret += agent.toString() + "<さん>" + conj;
+		return ret.substring(0, ret.length() - 1).replace(gameInfo.getAgent() + "<さん>", "<僕>");
+	}
+	
+	private static String resultsToTalk(GameInfo gameInfo, Collection<AgentTargetResult> results) {
+		String ret = "";
+		for(AgentTargetResult r: results) {
+			ret += r.getAgent() + "<さん>が" + r.getTarget() + "<さん>を";
+			if(r.getResult() == Species.WEREWOLF)
+				ret += "黒、";
+			else
+				ret += "白、";
+		}
+		return ret.substring(0, ret.length() - 1).replace(gameInfo.getAgent() + "<さん>", "<僕>");
+	}
+	
+	private String makeStatusTalk(GameInfo gameInfo) {		
+		String s = "";
+		Set<Agent> seers = getEstimate().getCoSet(Role.SEER);
+		List<AgentTargetResult> divs = getEstimate().getDivinedHistory();
+		List<Agent> attackeds = getEstimate().getAttackedAgents();
+		if(seers.contains(gameInfo.getAgent()))
+			s += "<僕>が占い師で、";		
+		seers.remove(gameInfo.getAgent());
+		if(!seers.isEmpty())
+			s += agentsToTalk(gameInfo, seers, 'と') + "が自称占い師で、";
+		if(!divs.isEmpty()) {
+			s += resultsToTalk(gameInfo, divs) + "と言っていて、";
+		}
+		if(!attackeds.isEmpty())
+			s += agentsToTalk(gameInfo, attackeds, 'と') + "が襲撃されて、";
+		if(s.length() < 1)
+			return null;
+		if(s.charAt(s.length() - 2) == 'で')
+			return s.substring(0, s.length() - 2) + "だから……、";
+		return s.substring(0, s.length() - 2) + "たから……、";
+	}
+	
+	private static List<Agent> max(Collection<Agent> candidate, Map<Agent, Double> likeness) {
+		List<Agent> ret = new ArrayList<>();
+		if(likeness == null)
+			return ret;
+		double max = Collections.max(likeness.values());
+		for(Agent agent: candidate)
+			if(Math.abs(max - likeness.get(agent)) < EPS)
+				ret.add(agent);
+		return ret;
+	}
+	
+	private static Map<Agent, Double> toPossessedLikeness(Map<Agent, Double> werewolfLikeness, Map<Agent, Double> villagerTeamLikeness) {
+		Map<Agent, Double> ret = new HashMap<>();
+		for(Agent agent: werewolfLikeness.keySet())
+			ret.put(agent, 1d - werewolfLikeness.get(agent) - villagerTeamLikeness.get(agent));
+		return ret;
+	}
 
 	private String skipTalk(GameInfo gameInfo, Collection<String> answers) {
+		List<Agent> candidate = gameInfo.getAgentList();
+		candidate.remove(gameInfo.getAgent());
+		String st = makeStatusTalk(gameInfo);
+		if(!talkedSet.contains("状況発言" + gameInfo.getDay()) && st != null){ // 状況発言
+			switch ((int)(Math.random() * 6)) {
+			case 0:
+				List<Agent> wolves = max(candidate, getEstimate().getWerewolfLikeness());
+				if(!wolves.isEmpty() && wolves.size() <= 2) {
+					talkedSet.add("状況発言" + gameInfo.getDay());
+					return r(st + agentsToTalk(gameInfo, wolves, 'か') + "が人狼だと思う<よ>。");
+				}
+				break;
+			case 1:
+				Estimate es = getEstimate();
+				List<Agent> possesseds = max(candidate, toPossessedLikeness(es.getWerewolfLikeness(), es.getVillagerTeamLikeness()));
+				if(!possesseds.isEmpty() && possesseds.size() <= 2) {
+					talkedSet.add("状況発言" + gameInfo.getDay());
+					return r(st + agentsToTalk(gameInfo, possesseds, 'か') + "が狂人だと思う<よ>。");
+				}
+				break;
+			}
+		}
+		
 		if(getEstimate().isPowerPlay()) { // PPモード 
 			if(!talkedSet.contains("パワープレイ反応")){
 				talkedSet.add("パワープレイ反応");
