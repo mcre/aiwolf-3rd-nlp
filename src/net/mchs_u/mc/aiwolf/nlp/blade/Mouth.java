@@ -148,7 +148,9 @@ public class Mouth {
 			else
 				ret += "白、";
 		}
-		return ret.substring(0, ret.length() - 1).replace(gameInfo.getAgent() + "<さん>", "<僕>");
+		if(ret.length() > 1)
+			return ret.substring(0, ret.length() - 1).replace(gameInfo.getAgent() + "<さん>", "<僕>");
+		return null;
 	}
 	
 	private String makeStatusTalk(GameInfo gameInfo) {		
@@ -162,7 +164,9 @@ public class Mouth {
 		if(!seers.isEmpty())
 			s += agentsToTalk(gameInfo, seers, 'と') + "が自称占い師で、";
 		if(!divs.isEmpty()) {
-			s += resultsToTalk(gameInfo, divs, seers) + "と言っていて、";
+			String d = resultsToTalk(gameInfo, divs, seers);
+			if(d != null)
+				s += resultsToTalk(gameInfo, divs, seers) + "と言っていて、";
 		}
 		if(!attackeds.isEmpty())
 			s += agentsToTalk(gameInfo, attackeds, 'と') + "が襲撃されて、";
