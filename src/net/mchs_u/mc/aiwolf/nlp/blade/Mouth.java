@@ -210,7 +210,7 @@ public class Mouth {
 				talkedSet.add("襲撃反応");
 				switch ((int)(Math.random() * 5)) {
 				case 0: return "本当に襲われるなんて。";
-				case 1: return r(gameInfo.getLastDeadAgentList().get(0) + "<さん>が死んでしまった。");
+				case 1: return r(gameInfo.getLastDeadAgentList().get(0) + "<さん>が死ん<じゃった>。");
 				}
 			}
 		}
