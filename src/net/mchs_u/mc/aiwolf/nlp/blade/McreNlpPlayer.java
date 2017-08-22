@@ -88,6 +88,8 @@ public class McreNlpPlayer implements Player {
 	}
 
 	public String getName() {
+		if(player == null)
+			return "m_cre";
 		return player.getName();
 	}
 
