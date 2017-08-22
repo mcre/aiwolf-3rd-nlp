@@ -199,7 +199,7 @@ public class Ear{
 						String main = roleClause.getKakuMap().get("ガ").getMain();
 						if(Clause.findMainClauses(clauses, "誰").size() > 0) { // 誰が人狼だと思う？
 							qas.put(key, ">>" + talker + " " + talker + "<さん>、<僕>は#<さん>が怪しいと思う<よ>。");
-						} else if(main.equals("君") || main.equals("あなた") || main.equals("御前")) { // あなたが人狼なんでしょう？, あなたが人狼なんですか！？
+						} else if(main.equals("君") || main.equals("おまえ") || main.equals("キミ") || main.equals("あなた") || main.equals("御前")) { // あなたが人狼なんでしょう？, あなたが人狼なんですか！？
 							qas.put(key, ">>" + talker + " " + talker + "<さん>、<僕>は人狼じゃない<よ>。");
 						} else {
 							qas.put(key, ">>" + talker + " " + talker + "<さん>、その質問はちょっとわからない<よ>。");
