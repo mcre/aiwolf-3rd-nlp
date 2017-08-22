@@ -30,6 +30,7 @@ public class Mouth {
 	private Map<String, String> characterMap = null;
 	
 	private boolean firstVoted = false;
+	private Agent targetOfVotingDeclarationToday = null;
 
 	public Mouth(McrePlayer player) {
 		this.player = player;
@@ -42,6 +43,7 @@ public class Mouth {
 	}
 
 	public void dayStart() {
+		targetOfVotingDeclarationToday = null;
 	}
 
 	public String toNaturalLanguageForTalk(GameInfo gameInfo, String protocol, Collection<String> answers) {
@@ -104,9 +106,22 @@ public class Mouth {
 			}
 			// 1回目の投票宣言は何も情報がない中での宣言なのでスルーする
 			if(firstVoted) {
-				switch ((int)(Math.random() * 2)) {
-				case 0: return r(t + "<さん>があやしいと思うから投票する<よ>。");
-				case 1: return r(t + "<さん>が人狼だと思うから投票する<よ>。");
+				Agent bak = targetOfVotingDeclarationToday;
+				targetOfVotingDeclarationToday = t;
+				if(bak == null || bak == t) {
+					switch ((int)(Math.random() * 2)) {
+					case 0:
+						return r(t + "<さん>があやしいと思うから投票する<よ>。");
+					case 1:
+						return r(t + "<さん>が人狼だと思うから投票する<よ>。");
+					}
+				} else {
+					switch ((int)(Math.random() * 2)) {
+					case 0:
+						return r("さっきと状況が変わったから、やっぱり" + t + "<さん>に投票する<よ>。");
+					case 1:
+						return r("やっぱり" + t + "<さん>が人狼だと思う。投票する<よ>。");
+					}
 				}
 			}
 			firstVoted = true;
@@ -152,8 +167,8 @@ public class Mouth {
 		if(s.length() < 1)
 			return null;
 		if(s.charAt(s.length() - 2) == 'で')
-			return s.substring(0, s.length() - 2) + "だから……、";
-		return s.substring(0, s.length() - 2) + "たから……、";
+			return s.substring(0, s.length() - 2) + "だから、";
+		return s.substring(0, s.length() - 2) + "たから、";
 	}
 	
 	private static List<Agent> max(Collection<Agent> candidate, Map<Agent, Double> likeness) {
@@ -217,8 +232,8 @@ public class Mouth {
 			if(!talkedSet.contains("襲撃反応")){
 				talkedSet.add("襲撃反応");
 				switch ((int)(Math.random() * 5)) {
-				case 0: return "本当に襲われるなんて……。";
-				case 1: return r(gameInfo.getLastDeadAgentList().get(0) + "<さん>が死んだ……。");
+				case 0: return "本当に襲われるなんて。";
+				case 1: return r(gameInfo.getLastDeadAgentList().get(0) + "<さん>が死んでしまった。");
 				}
 			}
 		}
@@ -244,7 +259,7 @@ public class Mouth {
 				if(!talkedSet.contains("二人占い師反応")){
 					talkedSet.add("二人占い師反応");
 					switch ((int)(Math.random() * 5)) {
-					case 0: return "どっちが本当の占い師なんだろう……。";
+					case 0: return "どっちが本当の占い師なんだろう。";
 					}
 				}
 			}
