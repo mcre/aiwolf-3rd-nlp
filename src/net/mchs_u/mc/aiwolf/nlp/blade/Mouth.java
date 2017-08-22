@@ -262,11 +262,18 @@ public class Mouth {
 			}
 		}
 		
+		// 8ターン目以降(7ターン目を読み込んでいる時)はここより下の発言を抑制
+		
+		int talkSize = gameInfo.getTalkList().size();
+		if(talkSize > 0)
+			if(gameInfo.getTalkList().get(talkSize - 1).getTurn() > 6)
+				return Talk.SKIP;
+		
 		List<Agent> candidate = gameInfo.getAgentList();
 		candidate.remove(gameInfo.getAgent());
 		String st = makeStatusTalk(gameInfo);
 		if(!talkedSet.contains("状況発言" + gameInfo.getDay()) && st != null){ // 状況発言
-			switch ((int)(Math.random() * 10)) {
+			switch ((int)(Math.random() * 6)) {
 			case 0:
 				List<Agent> wolves = max(candidate, getEstimate().getWerewolfLikeness());
 				if(!wolves.isEmpty() && wolves.size() <= 2) {
