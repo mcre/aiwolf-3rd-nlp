@@ -53,6 +53,7 @@ public class Ear{
 	
 	public List<String> toProtocolsForTalk(GameInfo gameInfo, Agent talker, String naturalLanguage) {
 		String key = talker + ":" + naturalLanguage;
+		
 		List<String> ret = new ArrayList<>();
 		try {			
 			Agent questionTo = null;
@@ -69,6 +70,8 @@ public class Ear{
 				ret.add(Talk.OVER);
 				return ret;
 			}
+			
+			System.out.println("　✩Parse: " + key);
 			
 			String nl = naturalLanguage;
 			
