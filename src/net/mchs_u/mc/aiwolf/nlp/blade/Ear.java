@@ -75,6 +75,7 @@ public class Ear{
 			nl = nl.replaceFirst("^>>Agent\\[..\\] ", "");
 			nl = hankakuToZenkaku(nl);
 			nl = nl.replace("ぼく占い師", "ぼくは占い師"); // 特殊な言い回しの置換
+			nl = nl.replace("］の結果", "］の占い結果"); // 特殊な言い回しの置換
 			
 			List<String> contents = talkToContents(gameInfo, talker, questionTo, key, Clause.createClauses(nl));
 			if(contents == null)
