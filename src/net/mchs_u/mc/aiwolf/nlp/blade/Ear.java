@@ -207,6 +207,11 @@ public class Ear{
 							qas.put(key, ">>" + talker + " " + talker + "<さん>、その質問はちょっとわからない<よ>。");
 						}
 					}
+					if(roleClause.getAiwolfWordMeaning().equals("占い師")) { // 占い師はいつCOすべきと思いますか？
+						if(Clause.findMainClauses(clauses, "いつ").size() > 0 && Clause.findMainClauses(clauses, "ＣＯ").size() > 0) {
+							qas.put(key, ">>" + talker + " " + talker + "<さん>、できるだけ早いほうがいいと思う<よ>。");
+						}
+					}
 				}
 			}
 		}
