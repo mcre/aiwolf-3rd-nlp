@@ -63,6 +63,8 @@ public class McreNlpPlayer implements Player {
 		player.initialize(gameInfo, gameSetting);
 		ear.initialize();
 		mouth.initialize(gameInfo);
+		
+		System.out.println("McreNlpPlayer.initialize, " + gameInfo.getAgent() + ", " + gameInfo.getRole());
 	}
 	
 	public void dayStart() {
