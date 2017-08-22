@@ -38,12 +38,18 @@ public class McreNlpPlayer implements Player {
 	}
 	
 	public String talk() {
-		String pr = Talk.SKIP;
-		if(gameInfo.getDay() > 0 && gameInfo.getTalkList().size() > 0)
-			pr = player.talk(); // 0日目とその日１回目のtalkはプロトコル版のtalkを呼ばない
-		String nl = mouth.toNaturalLanguageForTalk(gameInfo, pr, ear.getAnswers());
-		System.out.println("　●talk: " + gameInfo.getAgent() + " " + getName() + "\t" + nl + " ( <- " + pr + " ) ");
-		return nl;
+		try {
+			String pr = Talk.SKIP;
+			if(gameInfo.getDay() > 0 && gameInfo.getTalkList().size() > 0)
+				pr = player.talk(); // 0日目とその日１回目のtalkはプロトコル版のtalkを呼ばない
+			String nl = mouth.toNaturalLanguageForTalk(gameInfo, pr, ear.getAnswers());
+			System.out.println("　●talk: " + gameInfo.getAgent() + " " + getName() + "\t" + nl + " ( <- " + pr + " ) ");
+			return nl;
+		} catch(Exception e) {
+			System.err.println("エラー発生, SKIP送信");
+			e.printStackTrace();
+		}
+		return Talk.SKIP;
 	}
 	
 	public String whisper() {
