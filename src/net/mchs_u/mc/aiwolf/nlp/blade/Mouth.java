@@ -27,7 +27,7 @@ public class Mouth {
 	
 	private Set<String> talkedSet = null;
 	private McrePlayer player = null;
-	private Map<String, String> c = null; // character
+	private Map<String, String> characterMap = null;
 	
 	private boolean firstVoted = false;
 
@@ -37,7 +37,7 @@ public class Mouth {
 
 	public void initialize(GameInfo gameInfo) {
 		talkedSet = new HashSet<>();
-		c = Character.getCharactorMap(gameInfo.getAgent().getAgentIdx());
+		characterMap = Character.getCharacterMap(gameInfo.getAgent().getAgentIdx());
 		firstVoted = false;
 	}
 
@@ -269,8 +269,8 @@ public class Mouth {
 	
 	private String r(String s) { // replace
 		String ret = s;
-		for(String key: c.keySet())
-			ret = ret.replace("<" + key + ">", c.get(key));
+		for(String key: characterMap.keySet())
+			ret = ret.replace("<" + key + ">", characterMap.get(key));
 		return ret;
 	}
 

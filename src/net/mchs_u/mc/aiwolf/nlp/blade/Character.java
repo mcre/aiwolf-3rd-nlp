@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Character {
-	public static Map<String, String> getCharactorMap(int agentIdx) {
+	public static Map<String, String> getCharacterMap(int agentIdx) {
 		Map<String, String> c = new HashMap<>();
 		switch (agentIdx % 5) {
 		case 0:
