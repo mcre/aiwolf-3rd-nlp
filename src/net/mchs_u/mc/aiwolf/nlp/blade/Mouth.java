@@ -189,30 +189,7 @@ public class Mouth {
 		return ret;
 	}
 
-	private String skipTalk(GameInfo gameInfo, Collection<String> answers) {
-		List<Agent> candidate = gameInfo.getAgentList();
-		candidate.remove(gameInfo.getAgent());
-		String st = makeStatusTalk(gameInfo);
-		if(!talkedSet.contains("状況発言" + gameInfo.getDay()) && st != null){ // 状況発言
-			switch ((int)(Math.random() * 6)) {
-			case 0:
-				List<Agent> wolves = max(candidate, getEstimate().getWerewolfLikeness());
-				if(!wolves.isEmpty() && wolves.size() <= 2) {
-					talkedSet.add("状況発言" + gameInfo.getDay());
-					return r(st + agentsToTalk(gameInfo, wolves, 'か') + "が人狼だと思う<よ>。");
-				}
-				break;
-			case 1:
-				Estimate es = getEstimate();
-				List<Agent> possesseds = max(candidate, toPossessedLikeness(es.getWerewolfLikeness(), es.getVillagerTeamLikeness()));
-				if(!possesseds.isEmpty() && possesseds.size() <= 2) {
-					talkedSet.add("状況発言" + gameInfo.getDay());
-					return r(st + agentsToTalk(gameInfo, possesseds, 'か') + "が狂人だと思う<よ>。");
-				}
-				break;
-			}
-		}
-		
+	private String skipTalk(GameInfo gameInfo, Collection<String> answers) {		
 		if(getEstimate().isPowerPlay()) { // PPモード 
 			if(!talkedSet.contains("パワープレイ反応")){
 				talkedSet.add("パワープレイ反応");
@@ -276,6 +253,29 @@ public class Mouth {
 					else
 						return r(answer.replace("#", voteTarget.toString()));
 				}
+			}
+		}
+		
+		List<Agent> candidate = gameInfo.getAgentList();
+		candidate.remove(gameInfo.getAgent());
+		String st = makeStatusTalk(gameInfo);
+		if(!talkedSet.contains("状況発言" + gameInfo.getDay()) && st != null){ // 状況発言
+			switch ((int)(Math.random() * 10)) {
+			case 0:
+				List<Agent> wolves = max(candidate, getEstimate().getWerewolfLikeness());
+				if(!wolves.isEmpty() && wolves.size() <= 2) {
+					talkedSet.add("状況発言" + gameInfo.getDay());
+					return r(st + agentsToTalk(gameInfo, wolves, 'か') + "が人狼だと思う<よ>。");
+				}
+				break;
+			case 1:
+				Estimate es = getEstimate();
+				List<Agent> possesseds = max(candidate, toPossessedLikeness(es.getWerewolfLikeness(), es.getVillagerTeamLikeness()));
+				if(!possesseds.isEmpty() && possesseds.size() <= 2) {
+					talkedSet.add("状況発言" + gameInfo.getDay());
+					return r(st + agentsToTalk(gameInfo, possesseds, 'か') + "が狂人だと思う<よ>。");
+				}
+				break;
 			}
 		}
 
