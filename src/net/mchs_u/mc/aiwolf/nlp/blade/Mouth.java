@@ -137,9 +137,11 @@ public class Mouth {
 		return ret.substring(0, ret.length() - 1).replace(gameInfo.getAgent() + "<さん>", "<僕>");
 	}
 	
-	private static String resultsToTalk(GameInfo gameInfo, Collection<AgentTargetResult> results) {
+	private static String resultsToTalk(GameInfo gameInfo, Collection<AgentTargetResult> results, Set<Agent> seers) {
 		String ret = "";
 		for(AgentTargetResult r: results) {
+			if(!seers.contains(r.getAgent()))
+				continue;
 			ret += r.getAgent() + "<さん>が" + r.getTarget() + "<さん>を";
 			if(r.getResult() == Species.WEREWOLF)
 				ret += "黒、";
@@ -160,7 +162,7 @@ public class Mouth {
 		if(!seers.isEmpty())
 			s += agentsToTalk(gameInfo, seers, 'と') + "が自称占い師で、";
 		if(!divs.isEmpty()) {
-			s += resultsToTalk(gameInfo, divs) + "と言っていて、";
+			s += resultsToTalk(gameInfo, divs, seers) + "と言っていて、";
 		}
 		if(!attackeds.isEmpty())
 			s += agentsToTalk(gameInfo, attackeds, 'と') + "が襲撃されて、";
