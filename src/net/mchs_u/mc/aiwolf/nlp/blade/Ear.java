@@ -206,8 +206,6 @@ public class Ear{
 							qas.put(key, ">>" + talker + " " + talker + "<さん>、<僕>は#<さん>が怪しいと思う<よ>。");
 						} else if(main.equals("君") || main.equals("おまえ") || main.equals("キミ") || main.equals("あなた") || main.equals("御前")) { // あなたが人狼なんでしょう？, あなたが人狼なんですか！？
 							qas.put(key, ">>" + talker + " " + talker + "<さん>、<僕>は人狼じゃない<よ>。");
-						} else {
-							qas.put(key, ">>" + talker + " " + talker + "<さん>、その質問はちょっとわからない<よ>。");
 						}
 					}
 					if(roleClause.getAiwolfWordMeaning().equals("占い師")) { // 占い師はいつCOすべきと思いますか？
@@ -215,6 +213,7 @@ public class Ear{
 							qas.put(key, ">>" + talker + " " + talker + "<さん>、できるだけ早いほうがいいと思う<よ>。");
 						}
 					}
+					qas.put(key, ">>" + talker + " " + talker + "<さん>、その質問はちょっとわからない<よ>。");
 				}
 			}
 		}
