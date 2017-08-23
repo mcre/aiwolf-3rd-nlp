@@ -1,5 +1,7 @@
 package net.mchs_u.mc.aiwolf.nlp.blade;
 
+import java.util.Date;
+
 import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.data.Player;
 import org.aiwolf.common.data.Talk;
@@ -14,7 +16,6 @@ public class McreNlpPlayer implements Player {
 	private GameInfo gameInfo = null;
 	private Mouth mouth;
 	private Ear ear;
-	//private int listHead; // トークをどこまでprint/処理したかの管理
 
 	public McreNlpPlayer() {
 		player = new net.mchs_u.mc.aiwolf.dokin.McrePlayer();
@@ -23,6 +24,7 @@ public class McreNlpPlayer implements Player {
 	}
 	
 	public void update(GameInfo gameInfo) {
+		long s = (new Date()).getTime();
 		try {
 			this.gameInfo = gameInfo;
 			GameInfo prGameInfo = new GameInfoTranslater(gameInfo, ear);
@@ -31,9 +33,11 @@ public class McreNlpPlayer implements Player {
 			System.err.println("エラー発生, SKIP送信(update)");
 			e.printStackTrace();
 		}
+		System.out.println("　■update " + ((new Date()).getTime() - s) +  " (" + gameInfo.getAgent() + ")");
 	}
 	
 	public String talk() {
+		long s = (new Date()).getTime();
 		try {
 			String pr = Talk.SKIP;
 			if(gameInfo.getDay() > 0 && gameInfo.getTalkList().size() > 0)
@@ -45,6 +49,7 @@ public class McreNlpPlayer implements Player {
 			System.err.println("エラー発生, SKIP送信(talk)");
 			e.printStackTrace();
 		}
+		System.out.println("　■talk " + ((new Date()).getTime() - s) +  " (" + gameInfo.getAgent() + ")");
 		return Talk.SKIP;
 	}
 	

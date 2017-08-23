@@ -62,7 +62,7 @@ public class Ear{
 			
 			if(translatedMap.containsKey(key)) { // 履歴にある場合
 				if(questionTo != gameInfo.getAgent() || qas.containsKey(key)) { // 自分宛ての問いかけでない場合か、QA履歴にある場合
-					System.out.println(" ✩Skip ("+ gameInfo.getAgent() +")> " + key);
+					System.out.println("　✩Skip ("+ gameInfo.getAgent() +")> " + key);
 					return translatedMap.get(key); // 履歴から返す
 				}
 			} else if(naturalLanguage.contains(Talk.SKIP)) {
@@ -73,7 +73,7 @@ public class Ear{
 				return ret;
 			}
 			
-			System.out.println(" ✩Parse("+ gameInfo.getAgent() +")> " + key);
+			System.out.println("　✩Parse("+ gameInfo.getAgent() +")> " + key);
 			
 			String nl = naturalLanguage;
 			
