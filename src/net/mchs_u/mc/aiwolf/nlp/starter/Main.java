@@ -5,7 +5,7 @@ import java.net.SocketTimeoutException;
 
 public class Main {
 	public static void main(String[] args) throws InstantiationException, IllegalAccessException, SocketTimeoutException, IOException {
-		int gameNum = 10; // ローカル用
+		int gameNum = 100; // ローカル用
 		int port = 10010;
 		
 		String type = null;
@@ -16,7 +16,7 @@ public class Main {
 				
 		switch (type) {
 		case "ローカル*5":
-			Starter.startServer(port, gameNum, 300000);
+			Starter.startServer(port, gameNum, 5000);
 			for(int i = 0; i < 5; i++)
 				Starter.startAIClient("localhost", port);
 			break;
