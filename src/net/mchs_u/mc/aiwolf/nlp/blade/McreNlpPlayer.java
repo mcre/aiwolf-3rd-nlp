@@ -23,18 +23,14 @@ public class McreNlpPlayer implements Player {
 	}
 	
 	public void update(GameInfo gameInfo) {
-		this.gameInfo = gameInfo;
-		GameInfo prGameInfo = new GameInfoTranslater(gameInfo, ear);
-		player.update(prGameInfo);
-		
-		/* talkListとprTalkListの数の不整合でエラーが出るので一旦消す
-		List<Talk> talkList = gameInfo.getTalkList();
-		List<Talk> prTalkList = prGameInfo.getTalkList();
-		for(int i = listHead; i < prTalkList.size(); i++){
-			System.out.println("　○log : " + gameInfo.getAgent() + " " + getName() + "\t" + talkList.get(i) + " ( -> " + prTalkList.get(i).getText() + " ) ");
-			listHead++;
+		try {
+			this.gameInfo = gameInfo;
+			GameInfo prGameInfo = new GameInfoTranslater(gameInfo, ear);
+			player.update(prGameInfo);
+		} catch(Exception e) {
+			System.err.println("エラー発生, SKIP送信(update)");
+			e.printStackTrace();
 		}
-		*/
 	}
 	
 	public String talk() {
@@ -46,7 +42,7 @@ public class McreNlpPlayer implements Player {
 			System.out.println("　●talk: " + gameInfo.getAgent() + " " + getName() + "\t" + nl + " ( <- " + pr + " ) ");
 			return nl;
 		} catch(Exception e) {
-			System.err.println("エラー発生, SKIP送信");
+			System.err.println("エラー発生, SKIP送信(talk)");
 			e.printStackTrace();
 		}
 		return Talk.SKIP;
