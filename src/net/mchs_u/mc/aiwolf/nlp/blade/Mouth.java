@@ -300,8 +300,8 @@ public class Mouth {
 			Agent a = as.get(0);
 			switch ((int)(Math.random() * 10)) {
 			case 0: return r(">>" + a + " " + a + "<さん>、<あなた>は誰が人狼だと<思いますか>？");
-			case 1: return r(">>" + a + " " + a + "<さん>、<あなた>は誰が狂人だと<思いますか>？");
-			case 2: return r(">>" + a + " " + a + "<さん>、<あなた>は誰が村人だと<思いますか>？");
+			//case 1: return r(">>" + a + " " + a + "<さん>、<あなた>は誰が狂人だと<思いますか>？");
+			//case 2: return r(">>" + a + " " + a + "<さん>、<あなた>は誰が村人だと<思いますか>？");
 			}
 		}
 
