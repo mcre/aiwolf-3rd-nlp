@@ -204,16 +204,31 @@ public class Ear{
 						String main = roleClause.getKakuMap().get("ガ").getMain();
 						if(Clause.findMainClauses(clauses, "誰").size() > 0) { // 誰が人狼だと思う？
 							qas.put(key, ">>" + talker + " " + talker + "<さん>、<僕>は#<さん>が怪しいと思う<よ>。");
+							break;
 						} else if(main.equals("君") || main.equals("おまえ") || main.equals("キミ") || main.equals("あなた") || main.equals("御前")) { // あなたが人狼なんでしょう？, あなたが人狼なんですか！？
 							qas.put(key, ">>" + talker + " " + talker + "<さん>、<僕>は人狼じゃない<よ>。");
+							break;
+						} else {
+							qas.put(key, ">>" + talker + " " + talker + "<さん>、その質問はちょっとわからない<よ>。");
 						}
-					}
-					if(roleClause.getAiwolfWordMeaning().equals("占い師")) { // 占い師はいつCOすべきと思いますか？
+					} if(roleClause.getAiwolfWordMeaning().equals("狂人")) {
+						String main = roleClause.getKakuMap().get("ガ").getMain();
+						if(main.equals("君") || main.equals("おまえ") || main.equals("キミ") || main.equals("あなた") || main.equals("御前")) { // あなたが狂人なんでしょう？, あなたが狂人なんですか！？
+							qas.put(key, ">>" + talker + " " + talker + "<さん>、<僕>は狂人じゃない<よ>。");
+							break;
+						} else {
+							qas.put(key, ">>" + talker + " " + talker + "<さん>、その質問はちょっとわからない<よ>。");
+						}
+					} else if(roleClause.getAiwolfWordMeaning().equals("占い師")) { // 占い師はいつCOすべきと思いますか？
 						if(Clause.findMainClauses(clauses, "いつ").size() > 0 && Clause.findMainClauses(clauses, "ＣＯ").size() > 0) {
 							qas.put(key, ">>" + talker + " " + talker + "<さん>、できるだけ早いほうがいいと思う<よ>。");
+							break;
+						} else {
+							qas.put(key, ">>" + talker + " " + talker + "<さん>、その質問はちょっとわからない<よ>。");
 						}
+					} else {
+						qas.put(key, ">>" + talker + " " + talker + "<さん>、その質問はちょっとわからない<よ>。");
 					}
-					qas.put(key, ">>" + talker + " " + talker + "<さん>、その質問はちょっとわからない<よ>。");
 				}
 			}
 		}
