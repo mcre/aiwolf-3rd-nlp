@@ -19,6 +19,7 @@ public class Character {
 			c.put("なのですか", "なんですか");
 			c.put("だね", "だね");
 			c.put("じゃった", "じゃった");
+			c.put("思いますか", "思いますか");
 			break;
 		case 1:
 			c.put("こんにちは。", "オレが勝つ！");
@@ -32,6 +33,7 @@ public class Character {
 			c.put("なのですか", "なのか");
 			c.put("だね", "だな");
 			c.put("じゃった", "でしまった");
+			c.put("思いますか", "思う");
 			break;
 		case 2:
 			c.put("こんにちは。", "がんばります！");
@@ -45,6 +47,7 @@ public class Character {
 			c.put("なのですか", "なのですか");
 			c.put("だね", "ですね");
 			c.put("じゃった", "じゃいました");
+			c.put("思いますか", "思いますか");
 			break;
 		case 3:
 			c.put("こんにちは。", "よろしくね。");
@@ -58,6 +61,7 @@ public class Character {
 			c.put("なのですか", "なの");
 			c.put("だね", "ね");
 			c.put("じゃった", "じゃったわ");
+			c.put("思いますか", "思いますか");
 			break;
 		case 4:
 			c.put("こんにちは。", "ぼくが勝つよ！");
@@ -71,6 +75,7 @@ public class Character {
 			c.put("なのですか", "なの");
 			c.put("だね", "だね");
 			c.put("じゃった", "じゃった");
+			c.put("思いますか", "思いますか");
 			break;
 		}
 		return c;

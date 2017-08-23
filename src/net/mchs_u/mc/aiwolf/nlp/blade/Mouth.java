@@ -291,6 +291,19 @@ public class Mouth {
 				break;
 			}
 		}
+		
+		if(!talkedSet.contains("who")){
+			talkedSet.add("who");
+			List<Agent> as = new ArrayList<>(gameInfo.getAliveAgentList());
+			as.remove(gameInfo.getAgent());
+			Collections.shuffle(as);
+			Agent a = as.get(0);
+			switch ((int)(Math.random() * 10)) {
+			case 0: return r(">>" + a + " " + a + "<さん>、<あなた>は誰が人狼だと<思いますか>？");
+			case 1: return r(">>" + a + " " + a + "<さん>、<あなた>は誰が狂人だと<思いますか>？");
+			case 2: return r(">>" + a + " " + a + "<さん>、<あなた>は誰が村人だと<思いますか>？");
+			}
+		}
 
 		return Talk.SKIP;
 	}
