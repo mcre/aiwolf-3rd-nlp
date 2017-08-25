@@ -8,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +34,8 @@ import net.mchs_u.mc.aiwolf.dokin.McrePlayer;
 public class Ear{
 	private static final String DAT_FILE = "dic/translatedMap.dat";
 
-	private Map<String, List<String>> translatedMap = null; 
+	private Map<String, List<String>> translatedMap = null;
+	private Set<String> processedTalks = null; // このゲームで処理済みのtalk
 	private Map<String, String> qas = null; // Mouthに渡すQA集
 	
 	@SuppressWarnings("unused")
@@ -45,6 +47,7 @@ public class Ear{
 	}
 	
 	public void initialize() {
+		processedTalks = new HashSet<>();
 	}
 	
 	public void dayStart() {
@@ -61,7 +64,7 @@ public class Ear{
 				questionTo = Agent.getAgent(Integer.parseInt(naturalLanguage.substring(8, 10)));
 			
 			if(translatedMap.containsKey(key)) { // 履歴にある場合
-				if(questionTo != gameInfo.getAgent() || qas.containsKey(key)) { // 自分宛ての問いかけでない場合か、QA履歴にある場合
+				if(questionTo != gameInfo.getAgent() || processedTalks.contains(key)) { // 自分宛ての問いかけでない場合か、このゲームの処理済み履歴にある場合
 					return translatedMap.get(key); // 履歴から返す
 				}
 			} else if(naturalLanguage.contains(Talk.SKIP)) {
@@ -90,6 +93,7 @@ public class Ear{
 			ret.add(Talk.SKIP);
 		}
 		
+		processedTalks.add(key);
 		translatedMap.put(key, ret);
 		return ret;
 	}
